@@ -1,0 +1,76 @@
+<form method="POST">
+    {% csrf_token %}
+    
+    <!-- Financial Document fields -->
+    <style>
+        label {
+            display: inline-block;
+            width: 30%;
+        }
+    
+        .input-long {
+            display: inline-block;
+            width: 60%;
+        }
+        
+        .input-short {
+            display: inline-block;
+            width: 25%;
+        }
+
+        .line-item label, input, textarea {
+            display: inline-block;
+            width: 20%;
+            margin-bottom: 5px;
+        }
+
+    </style>
+    
+    <label for="business_name">Business Name:</label>
+    <input class="input-long" type="text" name="business_name" value="{{ financial_document.business_name }}">
+    <br>
+    <label for="business_address">Business Address:</label>
+    <textarea class="input-long" name="business_address">{{ financial_document.business_address }}</textarea>
+    <br>
+
+    <label for="transaction_datetime">Transaction Datetime:</label>
+    <input class="input-short" type="datetime-local" name="transaction_datetime" value="{{ formatted_datetime }}">
+    <br>
+
+    <label for="total_amount">Total Amount:</label>
+    <input class="input-short" type="number" name="total_amount" step="0.01" value="{{ financial_document.total_amount }}">
+    <br>
+
+    <h3>Line Items</h3>
+    
+    <!-- Existing Line Items -->
+    {% for item in financial_document.line_items.all %}
+        <div class="line-item">
+            <label for="item_{{ item.id }}">Item Name:</label>
+            <input class="item-name" type="text" name="item_{{ item.id }}" value="{{ item.item }}">
+            <br>
+
+            <label for="price_{{ item.id }}">Price:</label>
+            <input type="number" name="price_{{ item.id }}" value="{{ item.price }}" step="0.01">
+
+            <label for="category_{{ item.id }}">Category:</label>
+            <input type="text" name="category_{{ item.id }}" value="{{ item.category.name }}">
+
+            <button type="submit" name="remove_item" value="{{ item.id }}">Remove</button>
+        </div>
+        <br>
+    {% endfor %}
+
+    <h4>Add New Line Item</h4>
+    <!-- Form fields to add a new line item -->
+    <label for="new_item">New Item:</label>
+    <input type="text" name="new_item">
+
+    <label for="new_total_price">New Price:</label>
+    <input type="number" name="new_total_price" step="0.01">
+
+    <label for="new_category">New Category:</label>
+    <input type="text" name="new_category">
+
+    <button type="submit" name="save_button">Save Changes</button>
+</form>
