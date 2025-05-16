@@ -1,0 +1,15 @@
+# Django 
+*.log
+*.pot
+*.pyc
+__pycache__
+db.sqlite3
+media
+
+# Python
+**/__pycache__/
+venv/
+
+# Project
+genai_response.txt
+media/*.jpg
