@@ -1,26 +1,24 @@
-# Django 
+# Python
+*.pyc
+__pycache__/
+**/__pycache__/
+
+# Django
 *.log
 *.pot
-__pycache__
-**/__pycache__/
-*.pyc
 db.sqlite3
-media
+/media/              
+# TODO: check /media/ again
 
-# Python
+# Environment & Secrets
+*.env
+*.pem
 venv/
 
-# Project
-genai_response.txt
-media/*.jpg
-commonCommands.txt
-.pem
-.env
-
-**/build/
-
-frontend/node_modules/
-**/node_modules/
-*/node_modules/
+# Node / Frontend
 node_modules/
-node_modules/*
+**/build/           
+
+# Project Files
+genai_response.txt
+commonCommands.txt
