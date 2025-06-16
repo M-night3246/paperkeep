@@ -1,15 +1,26 @@
 # Django 
 *.log
 *.pot
-*.pyc
 __pycache__
+**/__pycache__/
+*.pyc
 db.sqlite3
 media
 
 # Python
-**/__pycache__/
 venv/
 
 # Project
 genai_response.txt
 media/*.jpg
+commonCommands.txt
+.pem
+.env
+
+**/build/
+
+frontend/node_modules/
+**/node_modules/
+*/node_modules/
+node_modules/
+node_modules/*
