@@ -1,0 +1,38 @@
+/* global.css */
+@import './theme.css';
+
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background-color: var(--bg-color-base);
+  color: var(--text-color);
+}
+
+.logo span {
+  color: var(--accent-color);
+}
+
+button, select {
+  background-color: var(--accent-color);
+  color: var(--white);
+}
+
+thead {
+  background-color: var(--accent-color);
+  color: var(--white);
+}
+
+tbody tr:hover {
+  background-color: var(--hover-bg);
+}
+
+button {
+  border: none;
+
+  svg {
+    background: none;
+    cursor: pointer;
+    color: var(--element-color);
+  }
+
+}

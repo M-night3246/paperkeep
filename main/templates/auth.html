@@ -1,0 +1,67 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Auth</title>
+  <script type="module" src="{% static 'main/js/firebase-auth.js' %}"></script>
+</head>
+<body>
+  <h1 id="form-title">Sign Up</h1>
+
+  <form id="auth-form">
+    <input type="email" id="email" placeholder="Email" required /><br/><br/>
+    <input type="password" id="password" placeholder="Password" required /><br/><br/>
+    <button type="submit" id="submit-btn">Sign Up</button>
+  </form>
+
+  <button id="toggle-btn">Switch to Login</button>
+
+  <div id="message" style="color:red; margin-top:10px;"></div>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      let isSignup = true;
+
+      const formTitle = document.getElementById('form-title');
+      const submitBtn = document.getElementById('submit-btn');
+      const toggleBtn = document.getElementById('toggle-btn');
+      const authForm = document.getElementById('auth-form');
+      const messageDiv = document.getElementById('message');
+
+      toggleBtn.onclick = () => {
+        isSignup = !isSignup;
+        if (isSignup) {
+          formTitle.textContent = "Sign Up";
+          submitBtn.textContent = "Sign Up";
+          toggleBtn.textContent = "Switch to Login";
+        } else {
+          formTitle.textContent = "Login";
+          submitBtn.textContent = "Login";
+          toggleBtn.textContent = "Switch to Sign Up";
+        }
+        messageDiv.textContent = "";
+      };
+
+      authForm.onsubmit = async (e) => {
+        e.preventDefault();
+        messageDiv.textContent = "";
+
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        try {
+          if (isSignup) {
+            await window.firebaseSignUp(email, password);
+          } else {
+            await window.firebaseLogin(email, password);
+          }
+          window.location.href = "/";  // Redirect to homepage on success
+        } catch (error) {
+          messageDiv.textContent = error.message;
+        }
+      };
+    });
+  </script>
+</body>
+</html>

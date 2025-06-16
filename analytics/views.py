@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 import json
-from paperkeep.models import FinancialDocument
+from main.models import FinancialDocument
 from django.contrib.auth.models import User
 from .utils import update_heatmap_with_new_address
+from rest_framework import permissions
 
 def update_heatmap(request):
     # Update heatmap with the address

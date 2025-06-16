@@ -1,3 +1,11 @@
+django
+pytesseract
 google-generativeai
-opencv
+opencv-python
 folium
+requests
+surya-ocr
+ollama
+psycopg
+psycopg2
+pandas

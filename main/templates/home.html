@@ -1,0 +1,32 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Home</title>
+  <script type="module" src="{% static 'main/js/firebase-auth.js' %}"></script>
+</head>
+<body>
+  <h1>Welcome to the Homepage</h1>
+
+  <button id="auth-btn">Sign Up</button>
+
+  <script>
+    // Wait for firebaseAuth.js to initialize auth state listener
+    window.addEventListener('DOMContentLoaded', () => {
+      const authBtn = document.getElementById('auth-btn');
+
+      // Handle button click (depends on auth state)
+      authBtn.onclick = () => {
+        if (window.isUserLoggedIn) {
+          // Logout if logged in
+          window.logoutUser();
+        } else {
+          // Redirect to auth page if not logged in
+          window.location.href = "/auth/";
+        }
+      };
+    });
+  </script>
+</body>
+</html>

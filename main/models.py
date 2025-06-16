@@ -3,13 +3,13 @@ from django.contrib.auth.models import User
 from django.db.models import Sum
 
 class FinancialDocument(models.Model):
-    document_number = models.CharField(max_length=50)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     image = models.ImageField(upload_to="documents/")
     business_name = models.CharField(max_length=255) # SSM states not longer than 50 characters
     business_address = models.TextField()
     transaction_datetime = models.DateTimeField()
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    upload_datetime = models.DateTimeField(auto_now_add=True)
         
     def __str__(self):
         return f"{self.__class__.__name__} from {self.business_name} on {self.transaction_datetime}"
@@ -41,22 +41,3 @@ class Budget(models.Model):
     def __str__(self):
         return f"{self.category.name} - Budget: {self.amount}"
 
-class BudgetAnalysis:
-    # You can implement custom functions or use Django’s aggregation methods to generate analytical reports.
-    # However, I suggest keeping this part abstract and dynamic, calculating it on the fly using Django’s ORM.
-    
-    @staticmethod
-    def calculate_total_spent(user, category=None):
-        transactions = LineItem.objects.filter(financial_document__user=user)
-        if category:
-            transactions = transactions.filter(category=category)
-        return transactions.aggregate(total_spent=Sum('amount'))['total_spent'] or 0.00
-    
-    @staticmethod
-    def calculate_remaining_budget(user, category):
-        budget = Budget.objects.filter(user=user, category=category).first()
-        if budget:
-            total_spent = BudgetAnalysis.calculate_total_spent(user, category)
-            return budget.amount - total_spent
-        if not budget:
-            raise ValueError(f"No budget found for category {category} and user {user}")
