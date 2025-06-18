@@ -1,0 +1,18 @@
+.dropzone-container {
+  border: 2px dashed var(--grey-dark);
+  border-radius: 8px;
+  padding: 30px;
+  text-align: center;
+  color: #555;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  align-items: center;
+  min-width: 300px;
+  min-height: 100px;
+  display: grid;
+}
+
+.dropzone-container.active {
+  border-color: var(--grey-dark);
+  background-color: var(--grey-light);
+}

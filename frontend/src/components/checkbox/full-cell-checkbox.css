@@ -1,0 +1,48 @@
+.full-cell-checkbox {
+  /* correlates with the .checkbox-full-cell in transactions-page.css */
+  min-width: 26px; 
+  min-height: 26px;
+  margin: 0.5rem;
+  padding: 0px;
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: var(--grey-light);
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+  display: inline-block;
+  border-radius: 6px;
+  position: relative;
+}
+
+.full-cell-checkbox:checked::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 9px;
+  width: 6px;
+  height: 12px;
+  border: solid var(--white);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.checkbox-body {
+  background-color: var(--grey-light);
+}
+
+.checkbox-body:checked {
+  background-color: var(--accent-color);
+}
+
+.checkbox-header {
+  background-color: var(--bg-color-surface);
+}
+
+.checkbox-header:checked {
+  background-color: var(--accent-color);
+}
+
+.checkbox-header:hover,
+.checkbox-body:hover {
+  filter: brightness(0.7);
+}
