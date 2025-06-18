@@ -14,7 +14,7 @@ element-color:  for elements such as buttons and icons
   --black: #000000;
   --black-shadow: #121619;
   --grey-light: #D9D9D9;
-  --grey: #B1B1B1;
+  --grey: #555;
   --grey-dark: #1a1a1a;
   --green-light: #8DB580;
   --green-dark: #2D4739;
@@ -27,8 +27,8 @@ element-color:  for elements such as buttons and icons
   --accent-color: var(--green-light);
   --element-color: var(--green-dark);
   --border-color: var(--grey-light);
-  --hover-bg: #f1f1f1;
-  --shadow-color: #121619;
+  --hover-over-white: #f1f1f1;
+  --shadow-color: var(--black-shadow);
   --shadow-color-rgb: 18, 22, 25;
 }
 
@@ -39,7 +39,7 @@ element-color:  for elements such as buttons and icons
   --black: #000000;
   --black-shadow: #121619;
   --grey-dark: #1a1a1a;
-  --grey: #B1B1B1;
+  --grey: #555;
   --grey-light: #D9D9D9;
   --green-light: #8DB580;
   --green-dark: #2D4739;
@@ -48,11 +48,11 @@ element-color:  for elements such as buttons and icons
   --bg-color-base: #0f0f0f;
   --bg-color-surface: var(--grey-dark);
   --bg-color-header: var(--grey-dark);
-  --text-color: #f0f0f0;
+  --text-color: var(--cream);
   --accent-color: var(--green-dark);
   --element-color: var(--green-light);
   --border-color: #333333;
-  --hover-bg: #2a2a2a;
-  --shadow-color: #121619;
+  --hover-over-white: #2a2a2a;
+  --shadow-color: var(--black-shadow);
   --shadow-color-rgb: 18, 22, 25;
 }

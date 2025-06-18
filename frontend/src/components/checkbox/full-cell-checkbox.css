@@ -44,5 +44,5 @@
 
 .checkbox-header:hover,
 .checkbox-body:hover {
-  filter: brightness(0.7);
+  filter: brightness(0.8);
 }

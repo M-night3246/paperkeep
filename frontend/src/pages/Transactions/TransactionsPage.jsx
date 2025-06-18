@@ -8,6 +8,7 @@ import IconSelect from "../../components/dropdowns/IconSelect";
 import FullCellCheckbox from "../../components/checkbox/FullCellCheckbox";
 import Select from 'react-select';
 import LargeButton from "../../components/buttons/LargeButton";
+import OptionModal from "../../components/popups/OptionModal";
 
 export default function TransactionList() {
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
@@ -20,6 +21,7 @@ export default function TransactionList() {
   const [selectedIds, setSelectedIds] = useState([]);
   const [deleteMessage, setDeleteMessage] = useState("");
   const [showCategoryTotals, setShowCategoryTotals] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
     async function fetchTransactions() {
@@ -62,7 +64,7 @@ export default function TransactionList() {
   const handleBulkAction = (selectedOption) => {
     switch (selectedOption.value) {
       case 'delete':
-        handleBatchDelete();
+        setShowDeleteModal(true);
         break;
       case 'download':
         handleDownload();
@@ -75,8 +77,7 @@ export default function TransactionList() {
     }
   };
 
-  async function handleBatchDelete() {
-    if (!window.confirm("Are you sure you want to delete the selected transactions?")) return;
+  async function confirmDeleteTransactions() {
     try {
       await Promise.all(
         selectedIds.map((id) =>
@@ -91,6 +92,8 @@ export default function TransactionList() {
       setTimeout(() => setDeleteMessage(""), 3000);
     } catch (err) {
       setDeleteMessage(`Error: ${err.message}`);
+    } finally {
+      setShowDeleteModal(false);
     }
   }
 
@@ -102,7 +105,7 @@ export default function TransactionList() {
 
   function handleDownload() {
     selectedIds.forEach((id) => {
-      // Example implementation: you can change this as needed
+      // TODO: change this
       window.open(`${API_BASE_URL}/api/receipts/documents/${id}/download/`, "_blank");
     });
   }
@@ -112,6 +115,24 @@ export default function TransactionList() {
 
   return (
     <AppLayout>
+      <OptionModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        title="Confirm Deletion"
+        message="Are you sure you want to delete the selected transactions?"
+        actions={[
+          {
+            label: "Cancel",
+            onClick: () => setShowDeleteModal(false),
+            style: { backgroundColor: 'var(--grey-light)', color: 'var(--black)' }
+          },
+          {
+            label: "Delete",
+            onClick: confirmDeleteTransactions,
+            style: { backgroundColor: 'var(--red)', color: 'var(--white)' }
+          }
+        ]}
+      />
       <div style={{ display: "flex", height: "100%" }}>
         <h1 style={{ maxWidth: "fit-content" }}>All Transactions</h1>
 
@@ -126,7 +147,7 @@ export default function TransactionList() {
             onChange={handleBulkAction}
             disabled={selectedIds.length < 1}
           />
-          <LargeButton onClick={() => navigate('/upload')}>
+          <LargeButton className="add-button" onClick={() => navigate('/upload')}>
             + Add
           </LargeButton>
           <label htmlFor="toggleCategory">Show Category Totals</label>
@@ -177,17 +198,6 @@ export default function TransactionList() {
                   <td className="text-center">RM{transaction.total_amount.toFixed(2)}</td>
                   <td>{new Date(transaction.transaction_datetime).toLocaleString()}</td>
                   <td>{new Date(transaction.upload_datetime).toLocaleString()}</td>
-                  {/* <td className="text-center">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleBatchDelete(transaction.id);
-                      }}
-                      className="delete-button"
-                    >
-                      Delete
-                    </button>
-                  </td> */}
                 </tr>
                 {showCategoryTotals && transaction.category_totals && (
                   <tr className="category-breakdown-row">
