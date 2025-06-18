@@ -5,7 +5,7 @@ import TransactionList from './pages/Transactions/TransactionsPage';
 
 // TODO: Change the below
 import EditFinancialDocument from './components/functions/EditFinancialDocument2';
-import UploadFinancialDocument from './components/functions/UploadFinancialDocument';
+import UploadPage from './pages/Transactions/UploadPage';
 
 export const routes = [
     { path: '/', element: <HomePage />, label: 'Home', showInSidebar: false },
@@ -17,5 +17,5 @@ export const routes = [
     // TODO: add documents here
     { path: '/analytics/dashboard', element: <AnalyticsDashboard />, label: 'Overview', icon: 'FaChartLine', showInSidebar: true },
     // TODO: add heatmap here
-    { path: '/upload', element: <UploadFinancialDocument />, label: 'Documents', icon: 'FaFolder', showInSidebar: true },
+    { path: '/upload', element: <UploadPage />, label: 'Documents', icon: 'FaFolder', showInSidebar: true },
 ];
