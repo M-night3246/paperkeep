@@ -18,8 +18,50 @@
 
 .transaction-table th,
 .transaction-table td {
-  text-align: left;
   padding: 0.5rem;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.transaction-table-checkbox {
+  min-height: 48px !important;
+  max-height: 48px !important;
+  padding: 0px !important;
+  display: flex;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bulk-action-bar {
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+.bulk-action-bar button {
+  background: #eee;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.bulk-action-bar button:hover {
+  background: #ddd;
+}
+
+.bottom-right-align {
+  display: flex;
+  flex-direction: row;
+  align-self: flex-end;
+  height: 100%;
+  margin-left: auto;
+  gap: 1rem;
 }
 
 /* .transaction-table thead tr {
@@ -30,16 +72,16 @@
   border-bottom: 1px solid rgba(var(--shadow-color-rgb), 0.1);
 } */
 
-.transaction-action-button {
+/* .transaction-action-button {
   color: white;
   background-color: red;
   border: none;
   padding: 5px 10px;
   cursor: pointer;
   border-radius: 4px;
-}
+} */
 
-.transaction-upload-link {
+/* .transaction-upload-link {
   display: inline-block;
   margin-top: 10px;
   text-decoration: none;
@@ -52,7 +94,7 @@
 
 .transaction-upload-link:hover {
   background-color: #3baaaa;
-}
+} */
 
 @media (max-width: 768px) {
   .transaction-table thead {
