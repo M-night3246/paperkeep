@@ -18,8 +18,12 @@ class LineItem(models.Model):
     financial_document = models.ForeignKey(FinancialDocument, related_name = "line_items", on_delete=models.CASCADE)
     item = models.CharField(max_length=255)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    category = models.ForeignKey("SpendingCategory", on_delete=models.SET_NULL, null=True)
-
+    category = models.ForeignKey(
+        "UserSpendingCategory",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="line_items"
+    )
     # def save(self, *args, **kwargs):
     #     self.total_price = self.quantity * self.unit_price
     #     super().save(*args, **kwargs)
@@ -27,15 +31,25 @@ class LineItem(models.Model):
     def __str__(self):
         return f"{self.item} (RM{self.total_price})"
     
-class SpendingCategory(models.Model):
-    name = models.CharField(max_length=50)
-    
-    def __str__(self):
-        return self.name
+class SystemSpendingCategory(models.Model):
+    key = models.SlugField(unique=True)  # e.g. 'groceries'
+    default_name = models.CharField(max_length=100)
+
+class UserSpendingCategory(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    system_category = models.ForeignKey(
+        SystemSpendingCategory,
+        on_delete=models.PROTECT
+    )
+    name = models.CharField(max_length=100)
     
 class Budget(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    category = models.ForeignKey('SpendingCategory', on_delete=models.CASCADE)
+    category = models.ForeignKey(
+        UserSpendingCategory,
+        on_delete=models.CASCADE,
+        related_name="budgets"
+    )
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     
     def __str__(self):

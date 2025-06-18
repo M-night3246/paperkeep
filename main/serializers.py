@@ -1,25 +1,37 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import FinancialDocument, LineItem, SpendingCategory, Budget
+from .models import FinancialDocument, LineItem, UserSpendingCategory, SystemSpendingCategory, Budget
+from collections import defaultdict
 
-class SpendingCategorySerializer(serializers.ModelSerializer):
+class SystemSpendingCategorySerializer(serializers.ModelSerializer):
     class Meta:
-        model = SpendingCategory
-        fields = ['id', 'name']
+        model = SystemSpendingCategory
+        fields = ['id', 'key', 'default_name']
+
+class UserSpendingCategorySerializer(serializers.ModelSerializer):
+    system_category = SystemSpendingCategorySerializer(read_only=True)
+    system_category_id = serializers.PrimaryKeyRelatedField(
+        queryset=SystemSpendingCategory.objects.all(),
+        source='system_category',
+        write_only=True
+    )
+
+    class Meta:
+        model = UserSpendingCategory
+        fields = ['id', 'name', 'system_category', 'system_category_id']
 
 class LineItemSerializer(serializers.ModelSerializer):
-    category = SpendingCategorySerializer(read_only=True)
-    # category_id = serializers.PrimaryKeyRelatedField(
-    #     queryset=SpendingCategory.objects.all(),
-    #     source='category',
-    #     write_only=True
-    # )
+    category = UserSpendingCategorySerializer(read_only=True)
+    category_id = serializers.PrimaryKeyRelatedField(
+        queryset=UserSpendingCategory.objects.all(),
+        source='category',
+        write_only=True
+    )
+    id = serializers.IntegerField(required=False)
 
-    id = serializers.IntegerField(required=False)  # For updates
-    
     class Meta:
         model = LineItem
-        fields = ['id', 'item', 'price', 'category']
+        fields = ['id', 'item', 'price', 'category', 'category_id']
 
 class FinancialDocumentSerializer(serializers.ModelSerializer):
     line_items = LineItemSerializer(many=True)
@@ -27,6 +39,7 @@ class FinancialDocumentSerializer(serializers.ModelSerializer):
         queryset=User.objects.all(), source='user', write_only=True
     )
     upload_datetime = serializers.DateTimeField(read_only=True)
+    category_totals = serializers.SerializerMethodField()
     
     class Meta:
         model = FinancialDocument
@@ -40,7 +53,16 @@ class FinancialDocumentSerializer(serializers.ModelSerializer):
             'total_amount',
             'line_items',
             'upload_datetime',
+            'category_totals',
         ]
+        
+    def get_category_totals(self, obj):
+        category_data = defaultdict(lambda: 0)
+        for item in obj.line_items.select_related('category__system_category').all():
+            if item.category and item.category.system_category:
+                key = item.category.system_category.key
+                category_data[key] += item.price
+        return {cat_key: str(total) for cat_key, total in category_data.items()}
 
     def create(self, validated_data):
         line_items_data = validated_data.pop('line_items')
@@ -85,9 +107,9 @@ class BudgetSerializer(serializers.ModelSerializer):
     user_id = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(), source='user', write_only=True
     )
-    category = SpendingCategorySerializer(read_only=True)
+    category = UserSpendingCategorySerializer(read_only=True)
     category_id = serializers.PrimaryKeyRelatedField(
-        queryset=SpendingCategory.objects.all(),
+        queryset=UserSpendingCategory.objects.all(),
         source='category',
         write_only=True
     )

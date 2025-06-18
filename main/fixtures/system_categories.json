@@ -1,0 +1,50 @@
+[
+  {
+    "model": "main.systemspendingcategory",
+    "pk": 1,
+    "fields": {
+      "key": "living-expenses",
+      "default_name": "Living Expenses"
+    }
+  },
+  {
+    "model": "main.systemspendingcategory",
+    "pk": 2,
+    "fields": {
+      "key": "food-groceries",
+      "default_name": "Food & Groceries"
+    }
+  },
+  {
+    "model": "main.systemspendingcategory",
+    "pk": 3,
+    "fields": {
+      "key": "health-wellness",
+      "default_name": "Health & Wellness"
+    }
+  },
+  {
+    "model": "main.systemspendingcategory",
+    "pk": 4,
+    "fields": {
+      "key": "personal-family-care",
+      "default_name": "Personal & Family Care"
+    }
+  },
+  {
+    "model": "main.systemspendingcategory",
+    "pk": 5,
+    "fields": {
+      "key": "entertainment-leisure",
+      "default_name": "Entertainment & Leisure"
+    }
+  },
+  {
+    "model": "main.systemspendingcategory",
+    "pk": 6,
+    "fields": {
+      "key": "miscellaneous",
+      "default_name": "Miscellaneous"
+    }
+  }
+]

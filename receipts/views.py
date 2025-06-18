@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseForbidden
 from main.utils import *
 from .utils import *
-from main.models import FinancialDocument, LineItem, SpendingCategory
+from main.models import FinancialDocument, LineItem, SystemSpendingCategory, UserSpendingCategory
 from django.core.files.storage import FileSystemStorage
 from django.contrib.auth.models import User
 from rest_framework.views import APIView
@@ -10,7 +10,6 @@ from rest_framework.response import Response
 from rest_framework import status, permissions
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.shortcuts import get_object_or_404
-from main.models import FinancialDocument, LineItem, SpendingCategory
 from main.serializers import FinancialDocumentSerializer
 from .utils import ocr_text_surya, llm_extract
 from main.utils import to_python_from_html_datetime
@@ -37,6 +36,37 @@ class UploadFinancialDocumentAPIView(APIView):
         # OCR and LLM extraction
         text = ocr_text_surya(image)
         extracted_data = llm_extract(text)
+        
+        if 'error' in extracted_data:
+            return Response({'error': extracted_data['error']}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        # === Match LLM categories to system & user categories ===
+        processed_line_items = []
+        for item in extracted_data.get('line_items', []):
+            category_name = item.get('category')
+            try:
+                # Find system category
+                system_cat = SystemSpendingCategory.objects.get(default_name__iexact=category_name.strip())
+
+                # Get or create a user-specific category mapping
+                user_cats = UserSpendingCategory.objects.filter(user=request.user, system_category=system_cat)
+                if user_cats.exists():
+                    user_cat = user_cats.first()  # Or handle the ambiguity as needed
+                else:
+                    user_cat = UserSpendingCategory.objects.create(
+                        user=request.user,
+                        system_category=system_cat,
+                        name=system_cat.default_name
+                    )
+
+                # Build line item payload
+                processed_line_items.append({
+                    'item': item.get('item', ''),
+                    'price': item.get('price', 0),
+                    'category_id': user_cat.id,
+                })
+            except SystemSpendingCategory.DoesNotExist:
+                continue  # skip unrecognized categories
 
         # Prepare data for serializer
         image_file.seek(0)
@@ -47,7 +77,7 @@ class UploadFinancialDocumentAPIView(APIView):
             'business_address': extracted_data.get('business_address', ''),
             'transaction_datetime': extracted_data.get('transaction_datetime', ''),
             'total_amount': extracted_data.get('total_amount', 0),
-            'line_items': extracted_data.get('line_items', []),
+            'line_items': processed_line_items,
         }
 
         serializer = FinancialDocumentSerializer(data=data)

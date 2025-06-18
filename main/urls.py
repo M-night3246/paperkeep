@@ -15,7 +15,8 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 router = DefaultRouter()
 router.register(r'financial-documents', FinancialDocumentViewSet)
 router.register(r'line-items', LineItemViewSet)
-router.register(r'spending-categories', SpendingCategoryViewSet)
+router.register(r'system-categories', SystemSpendingCategoryViewSet, basename='system-category')
+router.register(r'user-categories', UserSpendingCategoryViewSet, basename='user-category')
 router.register(r'budgets', BudgetViewSet)
 
 urlpatterns = [
