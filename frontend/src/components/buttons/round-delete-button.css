@@ -1,0 +1,20 @@
+.delete-button-round {
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  background-color: var(--red);
+  width: 1.3rem;
+  height: 1.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-button-round svg {
+  color: var(--white);
+  padding-top: 2px;
+}
+
+.delete-button-round:hover {
+  filter: brightness(0.8);
+}

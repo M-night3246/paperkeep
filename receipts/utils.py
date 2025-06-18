@@ -132,7 +132,8 @@ def llm_extract(text):
     try:
         lines = response.text.splitlines()
         if len(lines) < 2:
-            raise ValueError("GenAI returned an invalid response format.")
+            # raise ValueError("GenAI returned an invalid response format.")
+            raise ValueError("Our AI was unable to parse the info from the image. Please try with a clearer image.")
         
         lines = lines[1:-1]
         json_content = "\n".join(lines)

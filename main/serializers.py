@@ -25,10 +25,14 @@ class LineItemSerializer(serializers.ModelSerializer):
     category_id = serializers.PrimaryKeyRelatedField(
         queryset=UserSpendingCategory.objects.all(),
         source='category',
-        write_only=True
+        write_only=True,
+        required=False,
+        allow_null=True
     )
     id = serializers.IntegerField(required=False)
-
+    item = serializers.CharField(required=False, allow_blank=True)
+    price = serializers.DecimalField(max_digits=10, decimal_places=2, required=False, allow_null=True)
+    
     class Meta:
         model = LineItem
         fields = ['id', 'item', 'price', 'category', 'category_id']
@@ -38,6 +42,10 @@ class FinancialDocumentSerializer(serializers.ModelSerializer):
     user_id = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(), source='user', write_only=True
     )
+    business_name = serializers.CharField(required=False, allow_blank=True)
+    business_address = serializers.CharField(required=False, allow_blank=True)
+    transaction_datetime = serializers.DateTimeField(required=False, allow_null=True)
+    total_amount = serializers.DecimalField(max_digits=10, decimal_places=2, required=False, allow_null=True)
     upload_datetime = serializers.DateTimeField(read_only=True)
     category_totals = serializers.SerializerMethodField()
     
@@ -61,7 +69,7 @@ class FinancialDocumentSerializer(serializers.ModelSerializer):
         for item in obj.line_items.select_related('category__system_category').all():
             if item.category and item.category.system_category:
                 key = item.category.system_category.key
-                category_data[key] += item.price
+                category_data[key] += item.price or 0
         return {cat_key: str(total) for cat_key, total in category_data.items()}
 
     def create(self, validated_data):

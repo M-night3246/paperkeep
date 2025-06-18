@@ -5,10 +5,10 @@ from django.db.models import Sum
 class FinancialDocument(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     image = models.ImageField(upload_to="documents/")
-    business_name = models.CharField(max_length=255) # SSM states not longer than 50 characters
-    business_address = models.TextField()
-    transaction_datetime = models.DateTimeField()
-    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    business_name = models.CharField(max_length=255, blank=True) # SSM states not longer than 50 characters
+    business_address = models.TextField(blank=True)
+    transaction_datetime = models.DateTimeField(null=True, blank=True)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     upload_datetime = models.DateTimeField(auto_now_add=True)
         
     def __str__(self):
@@ -16,8 +16,8 @@ class FinancialDocument(models.Model):
     
 class LineItem(models.Model):
     financial_document = models.ForeignKey(FinancialDocument, related_name = "line_items", on_delete=models.CASCADE)
-    item = models.CharField(max_length=255)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    item = models.CharField(max_length=255, blank=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     category = models.ForeignKey(
         "UserSpendingCategory",
         on_delete=models.SET_NULL,

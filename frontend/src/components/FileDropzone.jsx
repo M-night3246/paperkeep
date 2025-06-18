@@ -2,27 +2,27 @@ import React from 'react';
 import { useDropzone } from 'react-dropzone';
 import './file-dropzone.css';
 
-export default function FileDropzone({ onFileAccepted }) {
+export default function FileDropzone({ onFileAccepted, multiple=true }) {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop: acceptedFiles => {
-      if (acceptedFiles.length > 1) {
-        alert("Please only upload one file at a time.");
-        return;
+      if (multiple) {
+        onFileAccepted(acceptedFiles);
+      } else if (acceptedFiles.length > 0) {
+        onFileAccepted(acceptedFiles[0]);
       }
-      onFileAccepted(acceptedFiles[0]);
     },
     accept: {
       'image/*': [],
       'application/pdf': []
     },
-    multiple: false,
+    multiple: multiple,
   });
 
   return (
     <div className={`dropzone-container ${isDragActive ? 'active' : ''}`} {...getRootProps()} >
       <input {...getInputProps()} />
       <p>
-        {isDragActive ? "Drop the file here..." : "Drag & drop an image or click to select"}
+        {isDragActive ? "Drop the file here..." : `Drag & drop ${multiple ? 'files' : 'a file'} or click to select`}
       </p>
     </div>
   );

@@ -20,72 +20,162 @@ class UploadFinancialDocumentAPIView(APIView):
 
     def post(self, request):
         # The image file should be in request.FILES['image']
-        image_file = request.FILES.get('image')
-        if not image_file:
-            return Response({'error': 'Image file is required'}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            image = Image.open(image_file)
-        except Exception as e:
-            return Response({'error': 'Invalid image file'}, status=400)
+        image_files = request.FILES.getlist('image')
+        if not image_files:
+            return Response({'error': 'At least one image file is required'}, status=status.HTTP_400_BAD_REQUEST)
         
-        # Save the uploaded image temporarily (if needed by OCR)
-        # fs = FileSystemStorage()
-        # image_path = fs.save(image.name, image)
-
-        # OCR and LLM extraction
-        text = ocr_text_surya(image)
-        extracted_data = llm_extract(text)
+        results  = []
         
-        if 'error' in extracted_data:
-            return Response({'error': extracted_data['error']}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        # === Match LLM categories to system & user categories ===
-        processed_line_items = []
-        for item in extracted_data.get('line_items', []):
-            category_name = item.get('category')
+        for image_file in image_files:
+            result_entry = {'filename': image_file.name}
+            
             try:
-                # Find system category
-                system_cat = SystemSpendingCategory.objects.get(default_name__iexact=category_name.strip())
+                image = Image.open(image_file)
+            except Exception as e:
+                result_entry['status'] = 'failed'
+                result_entry['error'] = 'Invalid image file'
+                results.append(result_entry)
+                continue
+            
+            # OCR and LLM extraction
+            text = ocr_text_surya(image)
+            extracted_data = llm_extract(text)
+            
+            if 'error' in extracted_data:
+                result_entry['status'] = 'failed'
+                result_entry['error'] = extracted_data['error']
+                results.append(result_entry)
+                continue
 
-                # Get or create a user-specific category mapping
-                user_cats = UserSpendingCategory.objects.filter(user=request.user, system_category=system_cat)
-                if user_cats.exists():
-                    user_cat = user_cats.first()  # Or handle the ambiguity as needed
-                else:
-                    user_cat = UserSpendingCategory.objects.create(
-                        user=request.user,
-                        system_category=system_cat,
-                        name=system_cat.default_name
-                    )
+            # Match LLM categories to system & user categories
+            processed_line_items = []
+            for item in extracted_data.get('line_items', []):
+                category_name = item.get('category')
+                try:
+                    # Find system category
+                    system_cat = SystemSpendingCategory.objects.get(default_name__iexact=category_name.strip())
 
-                # Build line item payload
-                processed_line_items.append({
-                    'item': item.get('item', ''),
-                    'price': item.get('price', 0),
-                    'category_id': user_cat.id,
-                })
-            except SystemSpendingCategory.DoesNotExist:
-                continue  # skip unrecognized categories
+                    # Get or create a user-specific category mapping
+                    user_cats = UserSpendingCategory.objects.filter(user=request.user, system_category=system_cat)
+                    # TODO: Change the user spending category to nothing
+                    if user_cats.exists():
+                        user_cat = user_cats.first()  # Or handle the ambiguity as needed
+                    else:
+                        user_cat = UserSpendingCategory.objects.create(
+                            user=request.user,
+                            system_category=system_cat,
+                            name=system_cat.default_name
+                        )
 
-        # Prepare data for serializer
-        image_file.seek(0)
-        data = {
-            'user_id': request.user.id,
-            'image': image_file,
-            'business_name': extracted_data.get('business_name', ''),
-            'business_address': extracted_data.get('business_address', ''),
-            'transaction_datetime': extracted_data.get('transaction_datetime', ''),
-            'total_amount': extracted_data.get('total_amount', 0),
-            'line_items': processed_line_items,
-        }
+                    # Build line item payload
+                    processed_line_items.append({
+                        'item': item.get('item', '') or '',
+                        'price': item.get('price', 0) or 0,
+                        'category_id': user_cat.id,
+                    })
+                except SystemSpendingCategory.DoesNotExist:
+                    continue  
 
-        serializer = FinancialDocumentSerializer(data=data)
-        if serializer.is_valid():
-            financial_document = serializer.save()
-            return Response(FinancialDocumentSerializer(financial_document).data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            # Prepare data for serializer
+            image_file.seek(0)
+            data = {
+                'user_id': request.user.id,
+                'image': image_file,
+                'business_name': extracted_data.get('business_name', '') or '',
+                'business_address': extracted_data.get('business_address', '') or '',
+                'transaction_datetime': extracted_data.get('transaction_datetime', ''),
+                'total_amount': extracted_data.get('total_amount', 0),
+                'line_items': processed_line_items,
+            }
+
+            serializer = FinancialDocumentSerializer(data=data)
+            if serializer.is_valid():
+                doc = serializer.save()
+                result_entry['status'] = 'success'
+                result_entry['document'] = FinancialDocumentSerializer(doc).data
+            else:
+                result_entry['status'] = 'failed'
+                result_entry['error'] = {
+                    'type': 'serializer_error',
+                    'details': serializer.errors
+                }
+                
+            results.append(result_entry)
+            
+        return Response(results, status=status.HTTP_207_MULTI_STATUS)
+    
+# class UploadFinancialDocumentAPIView(APIView):
+#     permission_classes = [permissions.IsAuthenticated]
+#     parser_classes = [MultiPartParser, FormParser]
+
+#     def post(self, request):
+#         # The image file should be in request.FILES['image']
+#         image_file = request.FILES.get('image')
+#         if not image_file:
+#             return Response({'error': 'Image file is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+#         try:
+#             image = Image.open(image_file)
+#         except Exception as e:
+#             return Response({'error': 'Invalid image file'}, status=400)
+        
+#         # Save the uploaded image temporarily (if needed by OCR)
+#         # fs = FileSystemStorage()
+#         # image_path = fs.save(image.name, image)
+
+#         # OCR and LLM extraction
+#         text = ocr_text_surya(image)
+#         extracted_data = llm_extract(text)
+        
+#         if 'error' in extracted_data:
+#             return Response({'error': extracted_data['error']}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+#         # === Match LLM categories to system & user categories ===
+#         processed_line_items = []
+#         for item in extracted_data.get('line_items', []):
+#             category_name = item.get('category')
+#             try:
+#                 # Find system category
+#                 system_cat = SystemSpendingCategory.objects.get(default_name__iexact=category_name.strip())
+
+#                 # Get or create a user-specific category mapping
+#                 user_cats = UserSpendingCategory.objects.filter(user=request.user, system_category=system_cat)
+#                 if user_cats.exists():
+#                     user_cat = user_cats.first()  # Or handle the ambiguity as needed
+#                 else:
+#                     user_cat = UserSpendingCategory.objects.create(
+#                         user=request.user,
+#                         system_category=system_cat,
+#                         name=system_cat.default_name
+#                     )
+
+#                 # Build line item payload
+#                 processed_line_items.append({
+#                     'item': item.get('item', ''),
+#                     'price': item.get('price', 0),
+#                     'category_id': user_cat.id,
+#                 })
+#             except SystemSpendingCategory.DoesNotExist:
+#                 continue  # skip unrecognized categories
+
+#         # Prepare data for serializer
+#         image_file.seek(0)
+#         data = {
+#             'user_id': request.user.id,
+#             'image': image_file,
+#             'business_name': extracted_data.get('business_name', ''),
+#             'business_address': extracted_data.get('business_address', ''),
+#             'transaction_datetime': extracted_data.get('transaction_datetime', ''),
+#             'total_amount': extracted_data.get('total_amount', 0),
+#             'line_items': processed_line_items,
+#         }
+
+#         serializer = FinancialDocumentSerializer(data=data)
+#         if serializer.is_valid():
+#             financial_document = serializer.save()
+#             return Response(FinancialDocumentSerializer(financial_document).data, status=status.HTTP_201_CREATED)
+#         else:
+#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class FinancialDocumentDetailAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]

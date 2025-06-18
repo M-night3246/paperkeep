@@ -1,4 +1,4 @@
-.upload-overlay {
+.overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -12,7 +12,7 @@
   pointer-events: all;
 }
 
-.upload-container {
+.container {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -23,8 +23,10 @@
 
 .upload-message {
   text-align: center;
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
   color: var(--green-dark);
+  font-size: 1rem;
+  font-family: "Poppins", sans-serif;
 }
 
 .upload-message.error {
@@ -44,10 +46,42 @@
   text-align: center;
 }
 
-.upload-image-preview {
+.upload-preview-container {
+  position: relative;
+  text-align: center;
+}
+
+/* .delete-button-round {
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  background-color: var(--accent-color);
+  width: 1.3rem;
+  height: 1.3rem;
+  
+
+  svg {
+    color: var(--white);
+    padding-top: 3px;
+  }
+
+  &:hover {
+    filter: brightness(0.8);
+  }
+} */
+
+.upload-preview-container .delete-button-round {
+  position: absolute;
+  top: 30px;
+  right: 15px;
+  width: 40px;
+  height: 40px;
+}
+
+.upload-preview-image {
   margin-top: 1rem;
-  max-width: 300px;
-  max-height: 400px;
+  max-width: 50vw;
+  max-height: 70vw;
   border: 1px solid #ccc;
   border-radius: 6px;
 }
