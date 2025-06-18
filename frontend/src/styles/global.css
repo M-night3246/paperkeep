@@ -22,6 +22,10 @@ thead {
   color: var(--white);
 }
 
+tbody {
+  font-size: 0.9rem;
+}
+
 tbody tr:hover {
   background-color: var(--hover-bg);
 }

@@ -1,7 +1,10 @@
 /* theme.css */
 
 /* 
-bg-color:
+bg-color-base: for the website base color
+bg-color-surface: for any surfaces such as backgrounds for tables
+bg-color-header: for the header and sidebar
+element-color:  for elements such as buttons and icons
 */
 
 /* Default (light mode) */
