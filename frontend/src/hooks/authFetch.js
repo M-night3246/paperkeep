@@ -8,8 +8,8 @@ const getCsrfTokenFromCookie = () => {
 };
 
 export const useAuthFetch = () => {
-  const { token } = useContext(AuthContext);
-
+  const { token, logout } = useContext(AuthContext);
+  
   const authFetch = async (url, options = {}) => {
     const csrfToken = getCsrfTokenFromCookie();
 
@@ -24,6 +24,11 @@ export const useAuthFetch = () => {
       ...options,
       headers,
     });
+
+    if (response.status === 401) {
+      logout(); 
+      throw new Error("Session expired. You've been logged out.");
+    }
 
     if (!response.ok) {
       throw new Error(`Error ${response.status}: ${response.statusText}`);
