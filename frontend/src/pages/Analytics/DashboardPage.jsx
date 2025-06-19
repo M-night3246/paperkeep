@@ -1,3 +1,90 @@
+import React, { useEffect, useState } from "react";
+import AppLayout from '../../components/layout/AppLayout';
+import MonthlySpendingChart from "../../components/charts/MonthlySpendingChart";
+import CategorySpendingChart from "../../components/charts/CategorySpendingChart";
+import TopMerchantsChart from "../../components/charts/TopMerchantsChart";
+import TopItemsChart from "../../components/charts/TopItemsChart";
+import DailySpendingChart from "../../components/charts/DailySpendingChart";
+import { useAuthFetch } from "../../hooks/authFetch";
+
+const DashboardPage = () => {
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+  const authFetch = useAuthFetch()
+  const [selectedMonth, setSelectedMonth] = useState("");
+  const [dashboardData, setDashboardData] = useState(null);
+
+  const fetchDashboardData = async (month = "") => {
+    try {
+      const response = await authFetch(`${API_BASE_URL}/api/analytics/dashboard/`, {
+        method: "GET",
+      });
+      setDashboardData(response);
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const handleMonthChange = (e) => {
+    const month = e.target.value;
+    setSelectedMonth(month);
+    fetchDashboardData(month);
+  };
+
+  if (!dashboardData) return <div>Loading dashboard...</div>;
+
+  return (
+    <AppLayout>
+      <div style={{ maxWidth: "80%" }}>
+        <h1>Spending Dashboard</h1>
+
+        <form>
+          <label htmlFor="month">Input Month:</label>
+          <input
+            type="month"
+            id="month"
+            name="month"
+            value={selectedMonth}
+            onChange={handleMonthChange}
+          />
+        </form>
+
+        <div className="charts-grid">
+          <div className="chart-box">
+            <h2>Monthly Spending</h2>
+            <MonthlySpendingChart data={dashboardData.monthly_spending} />
+          </div>
+
+          <div className="chart-box">
+            <h2>Spending by Category</h2>
+            <CategorySpendingChart data={dashboardData.category_spending} />
+          </div>
+
+          {/* <div className="chart-box">
+            <h2>Top Merchants</h2>
+            <TopMerchantsChart data={dashboardData.top_merchants} />
+          </div> */}
+
+          <div className="chart-box">
+            <h2>Top Items</h2>
+            <TopItemsChart data={dashboardData.top_items} />
+          </div>
+
+          <div className="chart-box full-width">
+            <h2>Daily Spending</h2>
+            <DailySpendingChart data={dashboardData.daily_spending} />
+          </div>
+        </div>
+      </div>
+    </AppLayout>
+  );
+};
+
+export default DashboardPage;
+
 // import React, { useEffect, useState, useRef } from 'react';
 // import Chart from 'chart.js/auto';
 // import ChartDataLabels from 'chartjs-plugin-datalabels';
@@ -186,78 +273,3 @@
 // };
 
 // export default AnalyticsDashboard;
-
-import React, { useEffect, useState } from "react";
-import AppLayout from '../../components/layout/AppLayout';
-import MonthlySpendingChart from "../../components/charts/MonthlySpendingChart";
-import CategorySpendingChart from "../../components/charts/CategorySpendingChart";
-import TopMerchantsChart from "../../components/charts/TopMerchantsChart";
-import TopItemsChart from "../../components/charts/TopItemsChart";
-import DailySpendingChart from "../../components/charts/DailySpendingChart";
-
-const AnalyticsDashboard = () => {
-  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
-
-  const [selectedMonth, setSelectedMonth] = useState("");
-  const [dashboardData, setDashboardData] = useState(null);
-
-  const fetchDashboardData = async (month = "") => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/analytics/dashboard-data/`, {
-        params: month ? { month } : {},
-        withCredentials: true,
-      });
-      setDashboardData(response.data);
-    } catch (error) {
-      console.error("Error fetching dashboard data:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
-
-  const handleMonthChange = (e) => {
-    const month = e.target.value;
-    setSelectedMonth(month);
-    fetchDashboardData(month);
-  };
-
-  if (!dashboardData) return <div>Loading dashboard...</div>;
-
-  return (
-    <AppLayout>
-      <div>
-        <h1>Spending Dashboard</h1>
-
-        <form>
-          <label htmlFor="month">Input Month:</label>
-          <input
-            type="month"
-            id="month"
-            name="month"
-            value={selectedMonth}
-            onChange={handleMonthChange}
-          />
-        </form>
-
-        <h2>Monthly Spending</h2>
-        <MonthlySpendingChart data={dashboardData.monthly_spending} />
-
-        <h2>Spending by Category</h2>
-        <CategorySpendingChart data={dashboardData.category_breakdown} />
-
-        <h2>Top Merchants</h2>
-        <TopMerchantsChart data={dashboardData.top_merchants} />
-
-        <h2>Top Items</h2>
-        <TopItemsChart data={dashboardData.top_items} />
-
-        <h2>Daily Spending</h2>
-        <DailySpendingChart data={dashboardData.daily_spending} />
-      </div>
-    </AppLayout>
-  );
-};
-
-export default AnalyticsDashboard;

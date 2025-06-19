@@ -1,21 +1,24 @@
 import HomePage from './pages/Home/HomePage';
 import AuthPage from './pages/Auth/AuthPage';
-import AnalyticsDashboard from './pages/Analytics/AnalyticsDashboard';
-import TransactionList from './pages/Transactions/TransactionsPage';
-
+import TransactionsPage from './pages/Transactions/TransactionsPage';
+import DashboardPage from './pages/Analytics/DashboardPage';
+import ReportsPage from './pages/Analytics/ReportsPage';
+import MapPage from './pages/Analytics/MapPage';
 // TODO: Change the below
-import EditFinancialDocument from './components/functions/EditFinancialDocument2';
+import EditTransactionsPage from './pages/Transactions/EditTransactionsPage';
 import UploadPage from './pages/Transactions/UploadPage';
 
 export const routes = [
     { path: '/', element: <HomePage />, label: 'Home', showInSidebar: false },
     { path: '/auth', element: <AuthPage />, label: 'Auth', showInSidebar: false },
-    { path: '/edit/:id', element: <EditFinancialDocument />, label: '', showInSidebar: false }, // dynamic route
+    { path: '/edit/:id', element: <EditTransactionsPage />, label: '', showInSidebar: false }, // dynamic route
 
     // Visible in sidebar
-    { path: '/transactions', element: <TransactionList />, label: 'Transactions', icon: 'FaDollarSign', showInSidebar: true },
+    { path: '/transactions', element: <TransactionsPage />, label: 'Transactions', icon: 'FaDollarSign', showInSidebar: true },
     // TODO: add documents here
-    { path: '/analytics/dashboard', element: <AnalyticsDashboard />, label: 'Overview', icon: 'FaChartLine', showInSidebar: true },
-    // TODO: add heatmap here
+    { path: '/analytics/dashboard', element: <DashboardPage />, label: 'Dashboard', icon: 'FaChartLine', showInSidebar: true },
+    { path: '/analytics/report', element: <ReportsPage />, label: 'Report', icon: 'FaFileContract', showInSidebar: true },
+    { path: '/analytics/map', element: <MapPage />, label: 'Map', icon: 'FaMapMarkerAlt', showInSidebar: true },
     { path: '/upload', element: <UploadPage />, label: 'Documents', icon: 'FaFolder', showInSidebar: true },
+    // TODO: add settings here
 ];

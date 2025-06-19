@@ -18,6 +18,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider } from "./contexts/AuthContext";
 import "@fontsource/poppins";
 import './styles/global.css';
+import 'leaflet/dist/leaflet.css';
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

@@ -1,27 +1,27 @@
 import React from "react";
 import { Bar } from "react-chartjs-2";
 import ChartDataLabels from "chartjs-plugin-datalabels";
-import ChartJS from 'chart.js/dist/chart.js';
-// import {
-//   Chart as ChartJS,
-//   BarElement,
-//   CategoryScale,
-//   LinearScale,
-//   Title,
-//   Tooltip,
-//   Legend,
-// } from "chart.js";
+// import ChartJS from 'chart.js/dist/chart.js';
+import {
+  Chart as ChartJS,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
 
-// ChartJS.register(BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend, ChartDataLabels);
+ChartJS.register(BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend, ChartDataLabels);
 
-ChartJS.register(
-  ChartJS.BarElement,
-  ChartJS.CategoryScale,
-  ChartJS.LinearScale,
-  ChartJS.Title,
-  ChartJS.Tooltip,
-  ChartJS.Legend
-);
+// ChartJS.register(
+//   ChartJS.BarElement,
+//   ChartJS.CategoryScale,
+//   ChartJS.LinearScale,
+//   ChartJS.Title,
+//   ChartJS.Tooltip,
+//   ChartJS.Legend
+// );
 
 const TopItemsChart = ({ data }) => {
   const items = data.map(item => item.item);
