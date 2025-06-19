@@ -26,15 +26,6 @@ const Header = ({ onToggleSidebar, isSidebarOpen, dark, setDark }) => {
     }
   };
 
-  // useEffect(() => {
-  //   fetch("http://127.0.0.1:8000/api/main/init/", {
-  //     method: "GET",
-  //     credentials: "include", // ⬅️ required to receive cookies
-  //   })
-  //     .then(res => res.json())
-  //     .then(data => console.log("CSRF setup data:", data));
-  // }, []);
-
   return (
     <header className="header">
       <button className="header-menu-button" onClick={onToggleSidebar}>
