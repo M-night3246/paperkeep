@@ -6,22 +6,25 @@ import { useNavigate } from 'react-router-dom';
 import "./transactions-page.css";
 import IconSelect from "../../components/dropdowns/IconSelect";
 import FullCellCheckbox from "../../components/checkbox/FullCellCheckbox";
-import Select from 'react-select';
+import ToggleSwitch from "../../components/buttons/ToggleSwitch";
+import LoadingOverlay from "../../components/layout/LoadingOverlay";
 import LargeButton from "../../components/buttons/LargeButton";
 import OptionModal from "../../components/popups/OptionModal";
 
-export default function TransactionList() {
+export default function TransactionsPage() {
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
   const authFetch = useAuthFetch();
   const navigate = useNavigate();
 
-  const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [transactions, setTransactions] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
-  const [deleteMessage, setDeleteMessage] = useState("");
-  const [showCategoryTotals, setShowCategoryTotals] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteMessage, setDeleteMessage] = useState("");
+  const [sortConfig, setSortConfig] = useState({ key: 'transaction_datetime', direction: 'desc' });
+  const [showLineItemsView, setShowLineItemsView] = useState(false);
+  const [showCategoryTotals, setShowCategoryTotals] = useState(false);
 
   useEffect(() => {
     async function fetchTransactions() {
@@ -38,6 +41,69 @@ export default function TransactionList() {
     }
     fetchTransactions();
   }, []);
+
+  const sortedTransactions = [...transactions].sort((a, b) => {
+    const aVal = a[sortConfig.key];
+    const bVal = b[sortConfig.key];
+
+    if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+    if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  const lineItems = transactions.flatMap((transaction) =>
+    transaction.line_items.map((lineItem) => ({
+      id: `${transaction.id}-${lineItem.id}`,
+      documentId: transaction.id,
+      business_name: transaction.business_name,
+      transaction_datetime: transaction.transaction_datetime,
+      item: lineItem.item,
+      price: lineItem.price,
+      category: lineItem.category?.name || "",
+    }))
+  );
+
+  const grouped = Object.entries(
+    Object.groupBy(lineItems, item => item.documentId)
+  );
+
+  const flattenedWithDividers = grouped.flatMap(([docId, items]) =>
+    items.map((item, index) => ({
+      ...item,
+      documentId: docId,
+      isLastInGroup: index === items.length - 1,
+    }))
+  );
+
+  const sortedLineItems = [...flattenedWithDividers].sort((a, b) => {
+    const aVal = a[sortConfig.key];
+    const bVal = b[sortConfig.key];
+
+    if (typeof aVal === "string" && typeof bVal === "string") {
+      return sortConfig.direction === "asc"
+        ? aVal.localeCompare(bVal)
+        : bVal.localeCompare(aVal);
+    }
+
+    return sortConfig.direction === "asc"
+      ? aVal - bVal
+      : bVal - aVal;
+  });
+
+  const handleSort = (key) => {
+    setSortConfig((prev) => {
+      if (prev.key === key) {
+        return { key, direction: prev.direction === 'asc' ? 'desc' : 'asc' };
+      } else {
+        return { key, direction: 'asc' };
+      }
+    });
+  };
+
+  const getSortArrow = (key) => {
+    if (sortConfig.key !== key) return '';
+    return sortConfig.direction === 'asc' ? '▲' : '▼';
+  };
 
   function toggleSelect(id) {
     setSelectedIds((prev) =>
@@ -110,7 +176,14 @@ export default function TransactionList() {
     });
   }
 
-  if (loading) return <p>Loading transactions...</p>;
+  if (loading) return
+  <div className="overlay">
+    <LoadingOverlay
+      messages={[
+        { delay: 0, text: 'Loading Transactions...' }
+      ]}
+    />
+  </div>;
   if (error) return <p style={{ color: "red" }}>Error: {error}</p>;
 
   return (
@@ -150,72 +223,143 @@ export default function TransactionList() {
           <LargeButton className="add-button" onClick={() => navigate('/upload')}>
             + Add
           </LargeButton>
-          <label htmlFor="toggleCategory">Show Category Totals</label>
-          <input
-            type="checkbox"
-            id="toggleCategory"
-            checked={showCategoryTotals}
-            onChange={() => setShowCategoryTotals(!showCategoryTotals)}
-          />
+          <div style={{ width: "50%", gap: "0.5rem" }}>
+            <ToggleSwitch
+              value={showCategoryTotals}
+              onChange={() => setShowCategoryTotals(!showCategoryTotals)}
+              label="Show categories"
+              disabled={showLineItemsView}
+              height={15}
+              width={30}
+              handleSize={10}
+              textSize="0.75rem"
+            />
+            <ToggleSwitch
+              value={showLineItemsView}
+              onChange={() => setShowLineItemsView(!showLineItemsView)}
+              label="Show line items"
+              height={15}
+              width={30}
+              handleSize={10}
+              textSize="0.75rem"
+            />
+          </div>
         </div>
       </div>
       <table className="transaction-table">
         <thead>
           <tr>
-            <th className="transaction-table-checkbox">
-              <FullCellCheckbox
-                type="checkbox"
-                checked={isAllSelected}
-                onChange={toggleSelectAll}
-                onClick={(e) => e.stopPropagation()}
-                variant="header"
-              />
-            </th>
-            <th>Business Name</th>
-            <th>Total Amount</th>
-            <th>Transaction Date</th>
-            <th>Upload Date</th>
-            {/* <th>Details</th> */}
+            {showLineItemsView ? (
+              <>
+                <th onClick={() => handleSort('item')} style={{ cursor: 'pointer' }}>
+                  Item {getSortArrow('item')}
+                </th>
+                <th onClick={() => handleSort('price')} style={{ cursor: 'pointer' }}>
+                  Price {getSortArrow('price')}
+                </th>
+                <th onClick={() => handleSort('business_name')} style={{ cursor: 'pointer' }}>
+                  Business Name {getSortArrow('business_name')}
+                </th>
+                <th onClick={() => handleSort('category')} style={{ cursor: 'pointer' }}>
+                  Category {getSortArrow('category')}
+                </th>
+                <th onClick={() => handleSort('transaction_datetime')} style={{ cursor: 'pointer' }}>
+                  Transaction Date {getSortArrow('transaction_datetime')}
+                </th>
+              </>
+            ) : (
+              <>
+                <th>
+                  <div className="transaction-table-checkbox">
+                    <FullCellCheckbox
+                      type="checkbox"
+                      checked={isAllSelected}
+                      onChange={toggleSelectAll}
+                      onClick={(e) => e.stopPropagation()}
+                      variant="header"
+                    />
+                  </div>
+                </th>
+                <th onClick={() => handleSort('business_name')} style={{ cursor: 'pointer' }}>
+                  Business Name {getSortArrow('business_name')}
+                </th>
+                <th onClick={() => handleSort('total_amount')} style={{ cursor: 'pointer' }}>
+                  Total Amount {getSortArrow('total_amount')}
+                </th>
+                <th onClick={() => handleSort('transaction_datetime')} style={{ cursor: 'pointer' }}>
+                  Transaction Date {getSortArrow('transaction_datetime')}
+                </th>
+                <th onClick={() => handleSort('upload_datetime')} style={{ cursor: 'pointer' }}>
+                  Upload Date {getSortArrow('upload_datetime')}
+                </th>
+                {showCategoryTotals && <th className="categories-cell">Categories</th>}
+              </>
+            )}
           </tr>
         </thead>
         <tbody>
-          {transactions.length === 0 ? (
-            <tr>
-              <td colSpan={5} className="no-transactions">No transactions found.</td>
-            </tr>
+          {showLineItemsView ? (
+            lineItems.length === 0 ? (
+              <tr><td colSpan={5} className="no-transactions">No line items found.</td></tr>
+            ) : (
+              sortedLineItems.map((item) => (
+                <tr
+                    key={item.id}
+                    className="line-item-row"
+                    onClick={() => navigate(`/edit/${item.documentId}`)}
+                    style={{
+                      cursor: "pointer",
+                      borderBottom:
+                        item.isLastInGroup && ['transaction_datetime', 'business_name'].includes(sortConfig.key)
+                          ? "2px solid #ccc"
+                          : "none"
+                    }}
+                  >
+                    <td>{item.item}</td>
+                    <td className="text-center">RM{parseFloat(item.price).toFixed(2)}</td>
+                    <td>{item.business_name}</td>
+                    <td>{item.category}</td>
+                    <td>{new Date(item.transaction_datetime).toLocaleString()}</td>
+                  </tr>
+              ))
+            )
           ) : (
-            transactions.map((transaction) => (
-              <React.Fragment key={transaction.id}>
+            sortedTransactions.length === 0 ? (
+              <tr><td colSpan={5} className="no-transactions">No transactions found.</td></tr>
+            ) : (
+              sortedTransactions.map((transaction) => (
                 <tr key={transaction.id} onClick={() => navigate(`/edit/${transaction.id}`)}>
-                  <td className="transaction-table-checkbox">
-                    <FullCellCheckbox
-                      checked={selectedIds.includes(transaction.id)}
-                      onClick={(e) => e.stopPropagation()}
-                      onChange={() => toggleSelect(transaction.id)}
-                    />
+                  <td>
+                    <div className="transaction-table-checkbox">
+                      <FullCellCheckbox
+                        checked={selectedIds.includes(transaction.id)}
+                        onClick={(e) => e.stopPropagation()}
+                        onChange={() => toggleSelect(transaction.id)}
+                      />
+                    </div>
                   </td>
                   <td>{transaction.business_name}</td>
                   <td className="text-center">RM{transaction.total_amount.toFixed(2)}</td>
                   <td>{new Date(transaction.transaction_datetime).toLocaleString()}</td>
                   <td>{new Date(transaction.upload_datetime).toLocaleString()}</td>
-                </tr>
-                {showCategoryTotals && transaction.category_totals && (
-                  <tr className="category-breakdown-row">
-                    <td></td>
-                    <td colSpan={4}>
-                      <strong>Category Breakdown:</strong>
-                      <ul style={{ margin: 0, paddingLeft: "1.2rem" }}>
-                        {Object.entries(transaction.category_totals).map(([category, amount]) => (
-                          <li key={category}>
-                            {category}: RM{parseFloat(amount).toFixed(2)}
-                          </li>
-                        ))}
-                      </ul>
+                  {showCategoryTotals && (
+                    <td className="categories-cell">
+                      {transaction.category_totals ? (
+                        <ul style={{ margin: 0, paddingLeft: "1.2rem" }}>
+                          {Object.entries(transaction.category_totals).map(([cat, amt]) => (
+                            <li key={cat}>
+                              {cat}: RM{parseFloat(amt).toFixed(2)}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        '-'
+                      )}
                     </td>
-                  </tr>
-                )}
-              </React.Fragment>
-            ))
+                  )}
+                </tr>
+              ))
+            )
           )}
         </tbody>
       </table>

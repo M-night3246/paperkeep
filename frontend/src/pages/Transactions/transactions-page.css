@@ -16,12 +16,29 @@
   box-shadow: 0px 5px 4px rgba(var(--shadow-color-rgb), 0.15);
 }
 
+.transaction-table td.categories-cell,
+.transaction-table th.categories-cell {
+  padding: 0.5rem;
+  text-align: left;
+  vertical-align: middle;
+  max-width: 16vw;
+  white-space: normal;
+  word-break: break-word;
+}
+
 .transaction-table th,
 .transaction-table td {
   padding: 0.5rem;
   text-align: left;
   vertical-align: middle;
 }
+
+.transaction-table thead tr,
+.transaction-table tbody tr {
+  vertical-align: middle;
+  align-items: center;
+}
+
 
 .transaction-table-checkbox {
   min-height: 48px !important;
@@ -44,6 +61,16 @@
 
 .add-button:hover {
   filter: brightness(0.8);
+}
+
+.line-separator hr {
+  border: none;
+  border-top: 1px solid #ccc;
+  margin: 6px 0;
+}
+
+.line-item-row:hover {
+  background-color: #f5f5f5;
 }
 
 @media (max-width: 768px) {
