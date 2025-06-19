@@ -4,13 +4,23 @@ from django.db.models import Sum
 
 class FinancialDocument(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    image = models.ImageField(upload_to="documents/")
+    image = models.ImageField(upload_to="documents/", blank=True, null=True)
+    image_url = models.URLField(blank=True, null=True)
     business_name = models.CharField(max_length=255, blank=True) # SSM states not longer than 50 characters
     business_address = models.TextField(blank=True)
+    visited_place = models.ForeignKey(
+        'analytics.VisitedPlace',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='documents'
+    )
     transaction_datetime = models.DateTimeField(null=True, blank=True)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    subtotal = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    tax = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     upload_datetime = models.DateTimeField(auto_now_add=True)
-        
+    note = models.TextField(blank=True, default="")      
     def __str__(self):
         return f"{self.__class__.__name__} from {self.business_name} on {self.transaction_datetime}"
     

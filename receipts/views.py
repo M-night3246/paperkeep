@@ -11,9 +11,9 @@ from rest_framework import status, permissions
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.shortcuts import get_object_or_404
 from main.serializers import FinancialDocumentSerializer
-from .utils import ocr_text_surya, llm_extract
+from .utils import ocr_text_surya, llm_extract, apply_priority_logic, generate_consistency_warnings, upload_image_to_firebase
 from main.utils import to_python_from_html_datetime
-
+    
 class UploadFinancialDocumentAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
@@ -26,11 +26,12 @@ class UploadFinancialDocumentAPIView(APIView):
         
         results  = []
         
-        for image_file in image_files:
+        for image_file in image_files:            
             result_entry = {'filename': image_file.name}
             
             try:
                 image = Image.open(image_file)
+                image_file.seek(0)
             except Exception as e:
                 result_entry['status'] = 'failed'
                 result_entry['error'] = 'Invalid image file'
@@ -76,23 +77,51 @@ class UploadFinancialDocumentAPIView(APIView):
                 except SystemSpendingCategory.DoesNotExist:
                     continue  
 
+            subtotal = extracted_data.get('subtotal', 0) or 0
+            tax = extracted_data.get('tax', 0) or 0
+            total_amount = extracted_data.get('total_amount', 0) or 0
+            line_items_total = sum((item.get('price') or 0) for item in processed_line_items)
+
+            note = []
+
+            subtotal, total_amount, priority_warnings  = apply_priority_logic(subtotal, tax, total_amount, line_items_total)
+            consistency_warnings = generate_consistency_warnings(subtotal, tax, total_amount, line_items_total, processed_line_items)
+            note = "\n".join(priority_warnings + consistency_warnings)
+            
             # Prepare data for serializer
-            image_file.seek(0)
+            try:
+                image_file.seek(0)
+                image_url = upload_image_to_firebase(image_file)
+                image_file.seek(0)
+            except Exception as e:
+                results.append({
+                    "filename": image_file.name,
+                    "status": "failed",
+                    "error": {"type": "upload_error", "details": str(e)}
+                })
+                continue
+            
             data = {
                 'user_id': request.user.id,
                 'image': image_file,
+                "image_url": image_url,
                 'business_name': extracted_data.get('business_name', '') or '',
                 'business_address': extracted_data.get('business_address', '') or '',
                 'transaction_datetime': extracted_data.get('transaction_datetime', ''),
-                'total_amount': extracted_data.get('total_amount', 0),
+                'subtotal': subtotal,
+                'tax': tax,
+                'total_amount': total_amount,
                 'line_items': processed_line_items,
+                'note': note,
             }
-
+                
             serializer = FinancialDocumentSerializer(data=data)
             if serializer.is_valid():
                 doc = serializer.save()
                 result_entry['status'] = 'success'
                 result_entry['document'] = FinancialDocumentSerializer(doc).data
+                if note:
+                    result_entry['note'] = note
             else:
                 result_entry['status'] = 'failed'
                 result_entry['error'] = {
@@ -103,79 +132,6 @@ class UploadFinancialDocumentAPIView(APIView):
             results.append(result_entry)
             
         return Response(results, status=status.HTTP_207_MULTI_STATUS)
-    
-# class UploadFinancialDocumentAPIView(APIView):
-#     permission_classes = [permissions.IsAuthenticated]
-#     parser_classes = [MultiPartParser, FormParser]
-
-#     def post(self, request):
-#         # The image file should be in request.FILES['image']
-#         image_file = request.FILES.get('image')
-#         if not image_file:
-#             return Response({'error': 'Image file is required'}, status=status.HTTP_400_BAD_REQUEST)
-
-#         try:
-#             image = Image.open(image_file)
-#         except Exception as e:
-#             return Response({'error': 'Invalid image file'}, status=400)
-        
-#         # Save the uploaded image temporarily (if needed by OCR)
-#         # fs = FileSystemStorage()
-#         # image_path = fs.save(image.name, image)
-
-#         # OCR and LLM extraction
-#         text = ocr_text_surya(image)
-#         extracted_data = llm_extract(text)
-        
-#         if 'error' in extracted_data:
-#             return Response({'error': extracted_data['error']}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-#         # === Match LLM categories to system & user categories ===
-#         processed_line_items = []
-#         for item in extracted_data.get('line_items', []):
-#             category_name = item.get('category')
-#             try:
-#                 # Find system category
-#                 system_cat = SystemSpendingCategory.objects.get(default_name__iexact=category_name.strip())
-
-#                 # Get or create a user-specific category mapping
-#                 user_cats = UserSpendingCategory.objects.filter(user=request.user, system_category=system_cat)
-#                 if user_cats.exists():
-#                     user_cat = user_cats.first()  # Or handle the ambiguity as needed
-#                 else:
-#                     user_cat = UserSpendingCategory.objects.create(
-#                         user=request.user,
-#                         system_category=system_cat,
-#                         name=system_cat.default_name
-#                     )
-
-#                 # Build line item payload
-#                 processed_line_items.append({
-#                     'item': item.get('item', ''),
-#                     'price': item.get('price', 0),
-#                     'category_id': user_cat.id,
-#                 })
-#             except SystemSpendingCategory.DoesNotExist:
-#                 continue  # skip unrecognized categories
-
-#         # Prepare data for serializer
-#         image_file.seek(0)
-#         data = {
-#             'user_id': request.user.id,
-#             'image': image_file,
-#             'business_name': extracted_data.get('business_name', ''),
-#             'business_address': extracted_data.get('business_address', ''),
-#             'transaction_datetime': extracted_data.get('transaction_datetime', ''),
-#             'total_amount': extracted_data.get('total_amount', 0),
-#             'line_items': processed_line_items,
-#         }
-
-#         serializer = FinancialDocumentSerializer(data=data)
-#         if serializer.is_valid():
-#             financial_document = serializer.save()
-#             return Response(FinancialDocumentSerializer(financial_document).data, status=status.HTTP_201_CREATED)
-#         else:
-#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class FinancialDocumentDetailAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -187,7 +143,7 @@ class FinancialDocumentDetailAPIView(APIView):
 
     def put(self, request, doc_id):
         financial_document = get_object_or_404(FinancialDocument, pk=doc_id, user=request.user)
-        serializer = FinancialDocumentSerializer(financial_document, data=request.data)
+        serializer = FinancialDocumentSerializer(financial_document, data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -205,6 +161,96 @@ class FinancialDocumentListAPIView(APIView):
         financial_documents = FinancialDocument.objects.filter(user=request.user).order_by('-transaction_datetime')
         serializer = FinancialDocumentSerializer(financial_documents, many=True)
         return Response(serializer.data)
+
+# class UploadFinancialDocumentAPIView(APIView):
+#     permission_classes = [permissions.IsAuthenticated]
+#     parser_classes = [MultiPartParser, FormParser]
+
+#     def post(self, request):
+#         # The image file should be in request.FILES['image']
+#         image_files = request.FILES.getlist('image')
+#         if not image_files:
+#             return Response({'error': 'At least one image file is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+#         results  = []
+        
+#         for image_file in image_files:
+#             result_entry = {'filename': image_file.name}
+            
+#             try:
+#                 image = Image.open(image_file)
+#             except Exception as e:
+#                 result_entry['status'] = 'failed'
+#                 result_entry['error'] = 'Invalid image file'
+#                 results.append(result_entry)
+#                 continue
+            
+#             # OCR and LLM extraction
+#             text = ocr_text_surya(image)
+#             extracted_data = llm_extract(text)
+            
+#             if 'error' in extracted_data:
+#                 result_entry['status'] = 'failed'
+#                 result_entry['error'] = extracted_data['error']
+#                 results.append(result_entry)
+#                 continue
+
+#             # Match LLM categories to system & user categories
+#             processed_line_items = []
+#             for item in extracted_data.get('line_items', []):
+#                 category_name = item.get('category')
+#                 try:
+#                     # Find system category
+#                     system_cat = SystemSpendingCategory.objects.get(default_name__iexact=category_name.strip())
+
+#                     # Get or create a user-specific category mapping
+#                     user_cats = UserSpendingCategory.objects.filter(user=request.user, system_category=system_cat)
+#                     # TODO: Change the user spending category to nothing
+#                     if user_cats.exists():
+#                         user_cat = user_cats.first()  # Or handle the ambiguity as needed
+#                     else:
+#                         user_cat = UserSpendingCategory.objects.create(
+#                             user=request.user,
+#                             system_category=system_cat,
+#                             name=system_cat.default_name
+#                         )
+
+#                     # Build line item payload
+#                     processed_line_items.append({
+#                         'item': item.get('item', '') or '',
+#                         'price': item.get('price', 0) or 0,
+#                         'category_id': user_cat.id,
+#                     })
+#                 except SystemSpendingCategory.DoesNotExist:
+#                     continue  
+
+#             # Prepare data for serializer
+#             image_file.seek(0)
+#             data = {
+#                 'user_id': request.user.id,
+#                 'image': image_file,
+#                 'business_name': extracted_data.get('business_name', '') or '',
+#                 'business_address': extracted_data.get('business_address', '') or '',
+#                 'transaction_datetime': extracted_data.get('transaction_datetime', ''),
+#                 'total_amount': extracted_data.get('total_amount', 0),
+#                 'line_items': processed_line_items,
+#             }
+
+#             serializer = FinancialDocumentSerializer(data=data)
+#             if serializer.is_valid():
+#                 doc = serializer.save()
+#                 result_entry['status'] = 'success'
+#                 result_entry['document'] = FinancialDocumentSerializer(doc).data
+#             else:
+#                 result_entry['status'] = 'failed'
+#                 result_entry['error'] = {
+#                     'type': 'serializer_error',
+#                     'details': serializer.errors
+#                 }
+                
+#             results.append(result_entry)
+            
+#         return Response(results, status=status.HTTP_207_MULTI_STATUS)
 
 # def upload_financial_document(request):
 #     # ONLY FOR TESTING REMOVE LATER
