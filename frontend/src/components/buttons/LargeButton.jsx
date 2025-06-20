@@ -1,6 +1,6 @@
 import React from 'react';
 
-const LargeButton = ({ children, onClick, style = {}, className = "" }) => {
+const LargeButton = ({ children, onClick, style = {}, className = "", ...props }) => {
   const defaultStyle = {
     minHeight: '35px',
     minWidth: '100px',
@@ -20,6 +20,7 @@ const LargeButton = ({ children, onClick, style = {}, className = "" }) => {
       onClick={onClick}
       style={{ ...defaultStyle, ...style }}
       className={className}
+      {...props}
     >
       {children}
     </button>

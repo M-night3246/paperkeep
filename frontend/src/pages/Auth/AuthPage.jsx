@@ -1,8 +1,9 @@
-// src/pages/AuthPage.jsx
 import React, { useState, useContext } from "react";
 import AppLayout from '../../components/layout/AppLayout';
 import { AuthContext } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router";
+import LargeButton from "../../components/buttons/LargeButton";
+import './auth-page.css';
 
 export default function AuthPage() {
   const { signUp, login } = useContext(AuthContext);
@@ -27,7 +28,7 @@ export default function AuthPage() {
       } else {
         await login(email, password);
       }
-      navigate("/"); // redirect on success
+      navigate("/");
     } catch (err) {
       setError(err.message);
     }
@@ -35,16 +36,16 @@ export default function AuthPage() {
 
   return (
     <AppLayout>
-      <div style={{ maxWidth: 400, margin: "2rem auto", textAlign: "center" }}>
+      <div className="auth-container">
         <h1>{isSignup ? "Sign Up" : "Login"}</h1>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="auth-form">
           <input
             type="email"
             placeholder="Email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            style={{ width: "100%", padding: "0.5rem", marginBottom: "1rem" }}
+            className="auth-input"
           />
           <input
             type="password"
@@ -52,19 +53,16 @@ export default function AuthPage() {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            style={{ width: "100%", padding: "0.5rem", marginBottom: "1rem" }}
+            className="auth-input"
           />
-          <button type="submit" style={{ width: "100%", padding: "0.5rem" }}>
+          <LargeButton type="submit" style={{ width: "100%" }}>
             {isSignup ? "Sign Up" : "Login"}
-          </button>
+          </LargeButton>
         </form>
-        <button
-          onClick={toggleMode}
-          style={{ marginTop: "1rem", background: "none", border: "none", color: "blue", cursor: "pointer" }}
-        >
-          {isSignup ? "Switch to Login" : "Switch to Sign Up"}
+        <button className="auth-toggle" onClick={toggleMode}>
+          {isSignup ? "Have an account?" : "Switch to Sign Up"}
         </button>
-        {error && <div style={{ color: "red", marginTop: "1rem" }}>{error}</div>}
+        {error && <div className="auth-error">{error}</div>}
       </div>
     </AppLayout>
   );
