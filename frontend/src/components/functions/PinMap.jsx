@@ -50,7 +50,7 @@ const PinMap = ({ places = [], flyTo = null }) => {
   const markerRefs = useRef({});
 
   return (
-    <MapContainer center={defaultCenter} zoom={10} style={{ height: "80vh", width: "100%" }}>
+    <MapContainer center={defaultCenter} zoom={10} style={{ height: "100%", width: "100%" }}>
       <TileLayer
         attribution='&copy; OpenStreetMap contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
