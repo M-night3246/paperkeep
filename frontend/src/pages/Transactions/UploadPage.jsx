@@ -8,10 +8,12 @@ import RoundDeleteButton from "../../components/buttons/RoundDeleteButton";
 import LoadingOverlay from "../../components/layout/LoadingOverlay";
 import OptionModal from "../../components/popups/OptionModal";
 import { FaTimes } from 'react-icons/fa';
+import { useNavigate } from "react-router";
 
 export default function UploadFinancialDocument() {
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
   const authFetch = useAuthFetch();
+  const navigate = useNavigate();
 
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [message, setMessage] = useState('');
@@ -122,7 +124,10 @@ export default function UploadFinancialDocument() {
           },
           {
             label: "Close",
-            onClick: () => setShowModal(false)
+            onClick: () => {
+              setShowModal(false);
+              navigate("/transactions");
+            }
           }
         ]}
       />
