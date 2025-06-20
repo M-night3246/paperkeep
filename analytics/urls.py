@@ -6,7 +6,7 @@ Path starts with "analytics/"
 
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import VisitedPlaceListAPIView
+from .views import VisitedPlaceListAPIView, FinancialDocumentSummaryAPIView
 from . import views
 
 # router = DefaultRouter()
@@ -18,5 +18,5 @@ urlpatterns = [
     # path('view-heatmap/', views.view_heatmap, name='view_heatmap'),
     path('visited-places/', VisitedPlaceListAPIView.as_view(), name='visited-places'),
     path("dashboard/", views.dashboard_data),
-    path("summary/", views.generate_spending_summary),
+    path("summary/", FinancialDocumentSummaryAPIView.as_view()),
 ]

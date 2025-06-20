@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect
 from rest_framework.views import APIView
 from main.models import FinancialDocument, LineItem
-from .utils import update_heatmap_with_new_address, generate_spending_summary
+from .utils import update_heatmap_with_new_address
+from .prompts import generate_spending_summary
 from rest_framework import permissions, generics
 from rest_framework.response import Response
 from django.db.models import Sum, Count
@@ -100,7 +101,7 @@ class FinancialDocumentSummaryAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
-        mode = request.query_params.get("mode", "monthly")  # 'weekly', 'compare'
+        mode = request.query_params.get("mode", "analytical")
         date_from = request.query_params.get("from")
         date_to = request.query_params.get("to")
 
@@ -112,7 +113,7 @@ class FinancialDocumentSummaryAPIView(APIView):
             ).prefetch_related("line_items__category")
         except Exception:
             return Response({"error": "Invalid date range."}, status=400)
-
+    
         summary_text = generate_spending_summary(docs, mode=mode, date_range_label=f"{date_from} to {date_to}")
         return Response({"summary": summary_text})
 

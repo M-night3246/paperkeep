@@ -91,49 +91,4 @@ def update_heatmap_with_new_address(address):
     
 
 
-genai.configure(api_key=os.getenv("GOOGLE_GENAI_KEY"))
 
-def generate_spending_summary(financial_docs, mode="monthly", date_range_label="This Month"):
-    """
-    Generates a summary from a queryset of FinancialDocument instances.
-    Mode: 'monthly', 'yearly', 'compare'
-    """
-    # Aggregate by category
-    category_totals = defaultdict(Decimal)
-    total = Decimal(0)
-    doc_lines = []
-
-    for doc in financial_docs:
-        total += doc.total_amount or 0
-        for line in doc.line_items.all():
-            if line.category and line.price:
-                category_name = line.category.name
-                category_totals[category_name] += line.price
-                doc_lines.append(f"- {line.item or 'Unknown'}: RM{line.price:.2f} ({category_name})")
-
-    # Format summary data
-    category_summary = "\n".join(
-        f"{cat}: RM{amt:.2f}" for cat, amt in category_totals.items()
-    )
-
-    prompt = f"""
-        You are a financial assistant. Analyze the following receipt data for the user.
-
-        Report period: {date_range_label}
-        Total spending: RM{total:.2f}
-        Spending by category:
-        {category_summary}
-
-        Line items:
-        {chr(10).join(doc_lines[:15])}{"\n..." if len(doc_lines) > 15 else ""}
-
-        Please provide a concise financial summary, including:
-        - What they spent the most on
-        - Any unusual spending patterns
-        - Recommendations or insights
-        Don't include extra greetings or disclaimers.
-            """.strip()
-
-    model = genai.GenerativeModel("gemini-1.5-pro")
-    response = model.generate_content(prompt)
-    return response.text if hasattr(response, 'text') else "No response generated."
