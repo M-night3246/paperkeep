@@ -15,10 +15,10 @@ export const routes = [
 
     // Visible in sidebar
     { path: '/transactions', element: <TransactionsPage />, label: 'Transactions', icon: 'FaDollarSign', showInSidebar: true },
+    { path: '/upload', element: <UploadPage />, label: 'Upload', icon: 'FaUpload', showInSidebar: true },
     // TODO: add documents here
     { path: '/analytics/dashboard', element: <DashboardPage />, label: 'Dashboard', icon: 'FaChartLine', showInSidebar: true },
     { path: '/analytics/report', element: <ReportsPage />, label: 'Report', icon: 'FaFileContract', showInSidebar: true },
     { path: '/analytics/map', element: <MapPage />, label: 'Map', icon: 'FaMapMarkerAlt', showInSidebar: true },
-    { path: '/upload', element: <UploadPage />, label: 'Documents', icon: 'FaFolder', showInSidebar: true },
     // TODO: add settings here
 ];
