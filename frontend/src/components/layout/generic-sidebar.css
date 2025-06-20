@@ -1,0 +1,27 @@
+.generic-sidebar {
+  width: 250px;
+  background-color: var(--bg-color-surface);
+  padding: 1rem;
+  overflow-y: auto;
+  height: 80vh;
+}
+
+.generic-sidebar h3 {
+  margin-top: 0;
+}
+
+.generic-sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.generic-sidebar li {
+  padding: 0.5rem;
+  cursor: pointer;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.generic-sidebar li:hover {
+  background-color: var(--hover-over-white);
+}
