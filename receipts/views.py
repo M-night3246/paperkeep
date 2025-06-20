@@ -1,18 +1,17 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponseForbidden
-from main.utils import *
-from .utils import *
-from main.models import FinancialDocument, LineItem, SystemSpendingCategory, UserSpendingCategory
-from django.core.files.storage import FileSystemStorage
-from django.contrib.auth.models import User
+
+from django.http import JsonResponse, HttpResponse
+from django.core.serializers.json import DjangoJSONEncoder
+from django.shortcuts import  get_object_or_404
+from main.serializers import FinancialDocumentSerializer
+from main.models import FinancialDocument, SystemSpendingCategory, UserSpendingCategory
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
+from django.utils.text import slugify
 from rest_framework.parsers import MultiPartParser, FormParser
-from django.shortcuts import get_object_or_404
-from main.serializers import FinancialDocumentSerializer
 from .utils import ocr_text_surya, llm_extract, apply_priority_logic, generate_consistency_warnings, upload_image_to_firebase
-from main.utils import to_python_from_html_datetime
+from main.utils import *
+from .utils import *
     
 class UploadFinancialDocumentAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -39,7 +38,7 @@ class UploadFinancialDocumentAPIView(APIView):
                 continue
             
             # OCR and LLM extraction
-            text = ocr_text_surya(image)
+            text = ocr_text_tesseract(image)
             extracted_data = llm_extract(text)
             
             if 'error' in extracted_data:
@@ -161,6 +160,18 @@ class FinancialDocumentListAPIView(APIView):
         financial_documents = FinancialDocument.objects.filter(user=request.user).order_by('-transaction_datetime')
         serializer = FinancialDocumentSerializer(financial_documents, many=True)
         return Response(serializer.data)
+    
+class FinancialDocumentDownloadAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, doc_id):
+        financial_document = get_object_or_404(FinancialDocument, pk=doc_id, user=request.user)
+        serializer = FinancialDocumentSerializer(financial_document)
+        data = json.dumps(serializer.data, indent=2, cls=DjangoJSONEncoder)
+
+        response = HttpResponse(data, content_type='application/json')
+        response['Content-Disposition'] = f'attachment; filename=financial-document-{doc_id}.json'
+        return response
 
 # class UploadFinancialDocumentAPIView(APIView):
 #     permission_classes = [permissions.IsAuthenticated]

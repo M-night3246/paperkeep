@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import AppLayout from '../../components/layout/AppLayout';
 import { FiTrash2, FiDownload, FiExternalLink } from 'react-icons/fi';
 import { useAuthFetch } from "../../hooks/authFetch";
+import { downloadFetch } from "../../hooks/downloadFetch";
 import { useNavigate } from 'react-router-dom';
 import "./transactions-page.css";
 import IconSelect from "../../components/dropdowns/IconSelect";
@@ -169,11 +170,43 @@ export default function TransactionsPage() {
     });
   }
 
-  function handleDownload() {
-    selectedIds.forEach((id) => {
-      // TODO: change this
-      window.open(`${API_BASE_URL}/api/receipts/documents/${id}/download/`, "_blank");
-    });
+  function sanitizeFilename(name) {
+    return name.split('.').slice(0, -1).join('.').replace(/[^a-z0-9]/gi, "_").toLowerCase();
+  }
+
+  async function handleDownload() {
+    try {
+      const allData = [];
+
+      for (const id of selectedIds) {
+        const blob = await downloadFetch(`${API_BASE_URL}/api/receipts/documents/${id}/download/`);
+        const text = await blob.text();
+        const json = JSON.parse(text);
+        allData.push(json);
+      }
+
+      const isSingle = allData.length === 1;
+      const filename = isSingle
+        ? `document-${sanitizeFilename(allData[0]?.image.split('/').pop() || selectedIds[0])}.json`
+        : `documents.json`;
+
+      const combinedBlob = new Blob(
+        [JSON.stringify(isSingle ? allData[0] : allData, null, 2)],
+        { type: "application/json" }
+      );
+
+      const url = URL.createObjectURL(combinedBlob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+
+    } catch (err) {
+      console.error("Combined download error:", err);
+    }
   }
 
   if (loading) return
@@ -304,23 +337,23 @@ export default function TransactionsPage() {
             ) : (
               sortedLineItems.map((item) => (
                 <tr
-                    key={item.id}
-                    className="line-item-row"
-                    onClick={() => navigate(`/edit/${item.documentId}`)}
-                    style={{
-                      cursor: "pointer",
-                      borderBottom:
-                        item.isLastInGroup && ['transaction_datetime', 'business_name'].includes(sortConfig.key)
-                          ? "2px solid #ccc"
-                          : "none"
-                    }}
-                  >
-                    <td>{item.item}</td>
-                    <td className="text-center">RM{parseFloat(item.price).toFixed(2)}</td>
-                    <td>{item.business_name}</td>
-                    <td>{item.category}</td>
-                    <td>{new Date(item.transaction_datetime).toLocaleString()}</td>
-                  </tr>
+                  key={item.id}
+                  className="line-item-row"
+                  onClick={() => navigate(`/edit/${item.documentId}`)}
+                  style={{
+                    cursor: "pointer",
+                    borderBottom:
+                      item.isLastInGroup && ['transaction_datetime', 'business_name'].includes(sortConfig.key)
+                        ? "2px solid #ccc"
+                        : "none"
+                  }}
+                >
+                  <td>{item.item}</td>
+                  <td className="text-center">RM{parseFloat(item.price).toFixed(2)}</td>
+                  <td>{item.business_name}</td>
+                  <td>{item.category}</td>
+                  <td>{new Date(item.transaction_datetime).toLocaleString()}</td>
+                </tr>
               ))
             )
           ) : (
