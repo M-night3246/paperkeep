@@ -92,7 +92,7 @@ def llm_extract(text):
     try:
         api_key = os.getenv("GOOGLE_GENAI_KEY")
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        model = genai.GenerativeModel("gemini-2.5-flash")
         prompt = (
             f"{text} Based on the text, extract the line items and prices for each line item in a structured json format. Datetime should be in YYYY-MM-DD HH:MM:SS. "
             "with the structure: business_name, business_address, transaction_datetime, total_amount, subtotal, tax, line_items -> item, price, category. "
