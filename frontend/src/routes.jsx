@@ -28,7 +28,7 @@ import MapPage from './pages/Analytics/MapPage';
 
 export const routes = [
   // Public routes
-  { path: '/', element: <HomePage />, label: 'Home', showInSidebar: false },
+//   { path: '/', element: <HomePage />, label: 'Home', showInSidebar: false },
   { path: '/auth', element: <AuthPage />, label: 'Auth', showInSidebar: false },
 
   // Protected routes
@@ -43,7 +43,7 @@ export const routes = [
     showInSidebar: false,
   },
   {
-    path: '/transactions',
+    path: '/',
     element: (
       <ProtectedRoute>
         <TransactionsPage />

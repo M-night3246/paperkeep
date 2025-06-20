@@ -105,7 +105,7 @@ export default function EditTransactionsPage() {
   <div className="overlay">
     <LoadingOverlay
       messages={[
-        { delay: 0, text: 'Loading Transactions...' }
+        { delay: 0, text: 'Updating...' }
       ]}
     />
   </div>;
@@ -117,7 +117,7 @@ export default function EditTransactionsPage() {
         isOpen={isNotifVisible}
         onClose={() => {
           setIsNotifVisible(false);
-          navigate("/transactions");
+          navigate("/");
         }}
         title={submitMessage?.title}
         message={submitMessage?.message}

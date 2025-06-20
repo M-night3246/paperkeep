@@ -126,7 +126,7 @@ export default function UploadFinancialDocument() {
             label: "Close",
             onClick: () => {
               setShowModal(false);
-              navigate("/transactions");
+              navigate("/");
             }
           }
         ]}
