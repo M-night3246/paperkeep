@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import './upload-page.css';
 import { useAuthFetch } from "../../hooks/authFetch";
 import AppLayout from '../../components/layout/AppLayout';
-import FileDropzone from "../../components/FileDropzone";
+import FileDropzone from "../../components/file/FileDropzone";
 import LargeButton from "../../components/buttons/LargeButton";
 import RoundDeleteButton from "../../components/buttons/RoundDeleteButton";
 import LoadingOverlay from "../../components/layout/LoadingOverlay";
