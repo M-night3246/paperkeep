@@ -10,7 +10,7 @@ const defaultIcon = L.icon({
 
 const customIcon = L.divIcon({
   className: 'custom-marker',
-  html: `<div style="width:15px;height:15px;border-radius:50%;background:var(--accent-color);border:2px solid white;"></div>`,
+  html: `<div style="width:15px;height:15px;border-radius:50%;background:var(--green-dark);border:2px solid white;"></div>`,
   iconSize: [15, 15],
   iconAnchor: [10, 10],
 });
