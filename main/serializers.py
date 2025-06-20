@@ -92,6 +92,8 @@ class FinancialDocumentSerializer(serializers.ModelSerializer):
             visit_date = localtime(document.transaction_datetime)
 
             lat, lon = geocode_address(document.business_address)
+            
+            # Attempt to find matching visited place
             place = VisitedPlace.objects.filter(
                 user=document.user,
                 latitude=lat,
@@ -99,6 +101,7 @@ class FinancialDocumentSerializer(serializers.ModelSerializer):
             ).first()
             
             if place:
+                # Update last_visited if newer
                 if not place.last_visited or visit_date > place.last_visited:
                     place.last_visited = visit_date
                     place.save()
@@ -112,23 +115,12 @@ class FinancialDocumentSerializer(serializers.ModelSerializer):
                     latitude=lat,
                     longitude=lon
                 )
-                
-            # place, _ = VisitedPlace.objects.get_or_create(
-            #     user=document.user,
-            #     name=document.business_name.strip(),
-            #     address=document.business_address.strip(),
-            #     visit_date=visit_date,
-            #     latitude=lat,
-            #     longitude=lon
-            #     # defaults={
-            #     #     "visit_date": visit_date
-            #     #     # optionally set lat/lng later if you geocode
-            #     # }
-            # )
-            
-            document.visited_place = place
-            document.save()    
-    
+
+            # Only update visited_place if it's different
+            if document.visited_place != place:
+                document.visited_place = place
+                document.save(update_fields=["visited_place"])
+
     def get_category_totals(self, obj):
         category_data = defaultdict(lambda: 0)
         for item in obj.line_items.select_related('category__system_category').all():
