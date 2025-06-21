@@ -208,9 +208,9 @@ class DashboardDataAPIView(APIView):
 
         for entry in monthly_data:
             cat_id = str(entry['category__id'])
-            month = entry['month']
-            if 1 <= month <= 12:
-                category_expense_lines[cat_id]['monthly'][month - 1] = float(entry['total'])
+            month_temp = entry['month']
+            if 1 <= month_temp <= 12:
+                category_expense_lines[cat_id]['monthly'][month_temp - 1] = float(entry['total'])
 
         user_categories_qs = Budget.objects.select_related('category').filter(user=user).values('category__id', 'category__name')
 
