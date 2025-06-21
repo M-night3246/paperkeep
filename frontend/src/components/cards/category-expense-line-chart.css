@@ -1,0 +1,28 @@
+.category-line-chart-card {
+  padding: 1rem;
+  border-radius: 8px;
+  background-color: var(--bg-color-surface);
+  box-shadow: var(--shadow);
+  width: 100%;
+  max-width: 400px;
+}
+
+.chart-container {
+  height: 300px;
+  margin-top: 1rem;
+}
+
+.selector-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.category-multi-select {
+  flex: 1;
+}
+
+.chart-container {
+  height: 300px;
+}

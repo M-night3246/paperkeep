@@ -1,0 +1,46 @@
+.top-items-card {
+  background-color: var(--bg-color-surface);
+  border-radius: 8px;
+  padding: 1rem;
+  font-family: 'Poppins', sans-serif;
+}
+
+.top-items-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.top-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--greys);
+}
+
+.item-rank {
+  width: 1.5rem;
+  text-align: right;
+  font-weight: 600;
+  color: var(--accent-color);
+}
+
+.item-name {
+  flex: 1;
+  margin-left: 0.5rem;
+}
+
+.item-amount {
+  font-weight: 500;
+  flex: 1;
+  text-align: end;
+}
+
+.item-times {
+    width: 40%;
+    text-align: center;
+}
+
+

@@ -1,0 +1,41 @@
+.donut-card {
+  width: 200px;
+  height: 220px;
+  background-color: #f9f7f2;
+  border-radius: 10px;
+  padding: 1rem;
+  font-family: 'Poppins', sans-serif;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+}
+
+.donut-label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.donut-wrapper {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  margin: 0 auto;
+}
+
+.donut-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.donut-percent {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+.donut-sub {
+  font-size: 0.85rem;
+  line-height: 1.2;
+  text-align: center;
+}

@@ -71,3 +71,18 @@ textarea:focus {
   justify-content: center;
   pointer-events: all;
 }
+
+.analytics-card {
+  background-color: var(--bg-color-surface);
+  border-radius: 10px;
+  padding: 1.5rem;
+  min-width: 200px;
+  max-width: 100%;
+  margin-bottom: 2rem;
+  box-shadow: 0px 2px 5px rgba(var(--shadow-color-rgb), 0.15);
+  font-family: 'Poppins', sans-serif;
+
+  .wide {
+    flex: 1;
+  }
+}

@@ -1,0 +1,41 @@
+.top-merchants-card {
+  background-color: var(--bg-color-surface);
+  border-radius: 8px;
+  padding: 1rem;
+  font-family: 'Poppins', sans-serif;
+}
+
+.top-merchants-title {
+  margin-bottom: 1rem;
+}
+
+.top-merchants-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.merchant-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--greys);
+}
+
+.merchant-rank {
+  width: 1.5rem;
+  text-align: right;
+  font-weight: 600;
+  color: var(--accent-color);
+}
+
+.merchant-name {
+  flex: 1;
+  margin-left: 0.5rem;
+}
+
+.merchant-amount {
+  font-weight: 500;
+}

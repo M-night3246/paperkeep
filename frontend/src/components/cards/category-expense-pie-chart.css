@@ -1,0 +1,15 @@
+.category-expenses-pie-chart {
+  padding: 1rem;
+  border-radius: 8px;
+  background-color: var(--bg-color-surface);
+  box-shadow: var(--shadow);
+  max-width: 500px;
+  width: 100%;
+}
+
+.pie-chart-wrapper {
+  min-height: 300px;
+  flex: 1;
+  height: 100%;
+  max-height: 400px;
+}

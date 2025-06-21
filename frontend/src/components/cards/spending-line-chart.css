@@ -1,0 +1,19 @@
+.spending-line-chart {
+  background-color: var(--bg-color-surface);
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  max-width: 600px;
+  width: 100%;
+}
+
+.mode-switch {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  align-items: center;
+}
+
+.line-chart-wrapper {
+  height: 300px;
+}
