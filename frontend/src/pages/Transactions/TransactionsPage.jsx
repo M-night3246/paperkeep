@@ -5,6 +5,7 @@ import { useAuthFetch } from "../../hooks/authFetch";
 import { downloadFetch } from "../../hooks/downloadFetch";
 import { useNavigate } from 'react-router-dom';
 import "./transactions-page.css";
+import NotificationModal from "../../components/popups/NotificationModal";
 import IconSelect from "../../components/dropdowns/IconSelect";
 import FullCellCheckbox from "../../components/checkbox/FullCellCheckbox";
 import ToggleSwitch from "../../components/buttons/ToggleSwitch";
@@ -22,7 +23,8 @@ export default function TransactionsPage() {
   const [transactions, setTransactions] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [deleteMessage, setDeleteMessage] = useState("");
+  const [showNotifModal, setShowNotifModal] = useState(false);
+  const [showErrNotifModal, setShowErrNotifModal] = useState(false);
   const [sortConfig, setSortConfig] = useState({ key: 'transaction_datetime', direction: 'desc' });
   const [showLineItemsView, setShowLineItemsView] = useState(false);
   const [showCategoryTotals, setShowCategoryTotals] = useState(false);
@@ -155,10 +157,11 @@ export default function TransactionsPage() {
       );
       setTransactions(transactions.filter((t) => !selectedIds.includes(t.id)));
       setSelectedIds([]);
-      setDeleteMessage("Transactions deleted successfully.");
-      setTimeout(() => setDeleteMessage(""), 3000);
+      setShowNotifModal(true);
     } catch (err) {
-      setDeleteMessage(`Error: ${err.message}`);
+      setError(err);
+      setShowErrNotifModal(true);
+      console.log(err);
     } finally {
       setShowDeleteModal(false);
     }
@@ -221,6 +224,22 @@ export default function TransactionsPage() {
 
   return (
     <AppLayout>
+      <NotificationModal
+        isOpen={showNotifModal}
+        onClose={() => {
+          setShowNotifModal(false);
+        }}
+        title="Deletion Successful"
+        message="Document(s) have been deleted successfully!"
+      />
+      <NotificationModal
+        isOpen={showErrNotifModal}
+        onClose={() => {
+          setShowErrNotifModal(false);
+        }}
+        title="Something Went Wrong"
+        message={error.message}
+      />
       <OptionModal
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
@@ -241,12 +260,6 @@ export default function TransactionsPage() {
       />
       <div style={{ display: "flex", height: "100%" }}>
         <h1 style={{ maxWidth: "fit-content" }}>All Transactions</h1>
-
-        {deleteMessage && (
-          <p className={`transaction-message ${deleteMessage.startsWith("Error") ? "error" : ""}`}>
-            {deleteMessage}
-          </p>
-        )}
         <div className={"bottom-right-align"} style={{ marginBottom: "1rem" }}>
           <IconSelect
             options={bulkActionOptions}
