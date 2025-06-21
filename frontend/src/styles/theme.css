@@ -58,5 +58,5 @@ element-color:  for elements such as buttons and icons
   --hover-over-white: #2a2a2a;
   --shadow-color: var(--black-shadow);
   --shadow-color-rgb: 18, 22, 25;
-  --greys: var(--grey-dark);
+  --greys: var(--grey);
 }
