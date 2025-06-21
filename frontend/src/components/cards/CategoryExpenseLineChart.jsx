@@ -20,19 +20,19 @@ export default function CategoryExpenseLineChart({ data, categories }) {
     const [viewMode, setViewMode] = useState('daily'); // 'daily' | 'monthly'
 
     const colorPalette = [
-    '#e6a1a6',
-    '#f2be6f',
-    '#e0d77e',
-    '#addfad',
-    '#a9c3f5',
-    '#c5a6e1',
+        '#e6a1a6',
+        '#f2be6f',
+        '#e0d77e',
+        '#addfad',
+        '#a9c3f5',
+        '#c5a6e1',
 
-    '#e6aed2',
-    '#f0c7bd',
-    '#f8f09c',
-    '#c9e7b3',
-    '#b0e0e6',
-    '#e6d0de',
+        '#e6aed2',
+        '#f0c7bd',
+        '#f8f09c',
+        '#c9e7b3',
+        '#b0e0e6',
+        '#e6d0de',
     ];
 
 
@@ -117,7 +117,7 @@ export default function CategoryExpenseLineChart({ data, categories }) {
                 },
                 title: {
                     display: true,
-                    text:  viewMode === 'daily' ? 'Day of Month' : 'Month',
+                    text: viewMode === 'daily' ? 'Day of Month' : 'Month',
                     font: {
                         family: 'Poppins', size: 12
                     },
@@ -134,7 +134,7 @@ export default function CategoryExpenseLineChart({ data, categories }) {
                 },
                 title: {
                     display: true,
-                    text:  'Amount (RM)',
+                    text: 'Amount (RM)',
                     font: {
                         family: 'Poppins', size: 12
                     },
@@ -142,7 +142,7 @@ export default function CategoryExpenseLineChart({ data, categories }) {
             },
         },
     };
-    
+
 
     return (
         <div className="analytics-card">
@@ -158,22 +158,22 @@ export default function CategoryExpenseLineChart({ data, categories }) {
                     className="category-multi-select"
                     styles={{
                         control: (base, state) => ({
-                        ...base,
-                        borderColor: state.isFocused ? 'var(--accent-color)' : base.borderColor,
-                        boxShadow: state.isFocused ? '0 0 0 1px var(--accent-color)' : base.boxShadow,
-                        '&:hover': {
-                            borderColor: 'var(--accent-color)',
-                        },
+                            ...base,
+                            borderColor: state.isFocused ? 'var(--accent-color)' : base.borderColor,
+                            boxShadow: state.isFocused ? '0 0 0 1px var(--accent-color)' : base.boxShadow,
+                            '&:hover': {
+                                borderColor: 'var(--accent-color)',
+                            },
                         }),
                         option: (base, state) => ({
-                        ...base,
-                        backgroundColor: state.isFocused ? 'var(--accent-color)' : base.backgroundColor,
-                        color: state.isFocused ? 'white' : base.color,
-                        cursor: 'pointer',
+                            ...base,
+                            backgroundColor: state.isFocused ? 'var(--accent-color)' : 'base.backgroundColor',
+                            color: state.isFocused ? 'white' : 'var(--black)',
+                            cursor: 'pointer',
                         }),
                         multiValueLabel: (base) => ({
-                        ...base,
-                        fontFamily: 'Poppins, sans-serif',
+                            ...base,
+                            fontFamily: 'Poppins, sans-serif',
                         }),
                     }}
                 />
