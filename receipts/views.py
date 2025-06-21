@@ -56,17 +56,13 @@ class UploadFinancialDocumentAPIView(APIView):
                     system_cat = SystemSpendingCategory.objects.get(default_name__iexact=category_name.strip())
 
                     # Get or create a user-specific category mapping
-                    user_cats = UserSpendingCategory.objects.filter(user=request.user, system_category=system_cat)
-                    # TODO: Change the user spending category to nothing
-                    if user_cats.exists():
-                        user_cat = user_cats.first()  # Or handle the ambiguity as needed
-                    else:
-                        user_cat = UserSpendingCategory.objects.create(
-                            user=request.user,
-                            system_category=system_cat,
-                            name=system_cat.default_name
-                        )
-
+                    user_cat = UserSpendingCategory.objects.get(
+                        user=request.user,
+                        system_category=system_cat,
+                        name=system_cat.default_name,
+                        is_main=True
+                    )
+                    
                     # Build line item payload
                     processed_line_items.append({
                         'item': item.get('item', '') or '',
@@ -74,7 +70,12 @@ class UploadFinancialDocumentAPIView(APIView):
                         'category_id': user_cat.id,
                     })
                 except SystemSpendingCategory.DoesNotExist:
-                    continue  
+                    continue
+                except UserSpendingCategory.DoesNotExist:
+                    result_entry['status'] = 'failed'
+                    result_entry['error'] = f"No main category found for: {category_name}"
+                    results.append(result_entry)
+                    continue
 
             subtotal = extracted_data.get('subtotal', 0) or 0
             tax = extracted_data.get('tax', 0) or 0

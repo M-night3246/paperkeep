@@ -52,6 +52,10 @@ class UserSpendingCategory(models.Model):
         on_delete=models.PROTECT
     )
     name = models.CharField(max_length=100)
+    is_main = models.BooleanField(default=False)
+    
+    class Meta:
+        unique_together = ('user', 'system_category', 'is_main')
     
 class Budget(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -61,6 +65,9 @@ class Budget(models.Model):
         related_name="budgets"
     )
     amount = models.DecimalField(max_digits=10, decimal_places=2)
+    
+    class Meta:
+        unique_together = ('user', 'category')
     
     def __str__(self):
         return f"{self.category.name} - Budget: {self.amount}"

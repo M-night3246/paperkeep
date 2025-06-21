@@ -19,10 +19,14 @@ class UserSpendingCategorySerializer(serializers.ModelSerializer):
         source='system_category',
         write_only=True
     )
+    
+    def create(self, validated_data):
+        validated_data['is_main'] = False
+        return super().create(validated_data)
 
     class Meta:
         model = UserSpendingCategory
-        fields = ['id', 'name', 'system_category', 'system_category_id']
+        fields = ['id', 'name', 'is_main', 'system_category', 'system_category_id']
 
 class LineItemSerializer(serializers.ModelSerializer):
     category = UserSpendingCategorySerializer(read_only=True)
@@ -104,6 +108,7 @@ class FinancialDocumentSerializer(serializers.ModelSerializer):
                 # Update last_visited if newer
                 if not place.last_visited or visit_date > place.last_visited:
                     place.last_visited = visit_date
+                    # place.times_visited=+1,
                     place.save()
 
             if not place:
@@ -112,8 +117,9 @@ class FinancialDocumentSerializer(serializers.ModelSerializer):
                     name=document.business_name.strip(),
                     address=document.business_address.strip(),
                     last_visited=visit_date,
+                    # times_visited=1,
                     latitude=lat,
-                    longitude=lon
+                    longitude=lon,
                 )
 
             # Only update visited_place if it's different
@@ -191,9 +197,9 @@ class FinancialDocumentSerializer(serializers.ModelSerializer):
         return instance
 
 class BudgetSerializer(serializers.ModelSerializer):
-    user_id = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(), source='user', write_only=True
-    )
+    # user_id = serializers.PrimaryKeyRelatedField(
+    #     queryset=User.objects.all(), source='user', write_only=True, required=False,
+    # )
     category = UserSpendingCategorySerializer(read_only=True)
     category_id = serializers.PrimaryKeyRelatedField(
         queryset=UserSpendingCategory.objects.all(),
@@ -203,4 +209,5 @@ class BudgetSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Budget
-        fields = ['id', 'user_id', 'category', 'category_id', 'amount']
+        # fields = ['id', 'user_id', 'category', 'category_id', 'amount']
+        fields = ['id', 'category', 'category_id', 'amount']

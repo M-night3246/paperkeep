@@ -13,7 +13,7 @@ load_dotenv()
 def create_default_user_categories(user):
     system_categories = SystemSpendingCategory.objects.all()
     UserSpendingCategory.objects.bulk_create([
-        UserSpendingCategory(user=user, system_category=cat, name=cat.default_name)
+        UserSpendingCategory(user=user, system_category=cat, name=cat.default_name, is_main=True)
         for cat in system_categories
     ])
 
