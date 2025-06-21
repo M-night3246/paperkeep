@@ -75,11 +75,12 @@ const DashboardPage = () => {
     <AppLayout>
 
       <div style={{ maxWidth: "100%" }}>
+        
         <div style={{ display: "flex", width: "100%", alignItems: "end", justifyContent: "space-between" }}>
           <div>
             <h1>Spending Dashboard</h1>
             <div style={{ padding: "0rem 0.5rem 0rem 0.5rem", textAlign: "justify", marginBottom: "1.5rem"}}>
-              *Amounts recorded in the dashboard excludes tax for line-item-based calculations.
+              *Amounts recorded in the dashboard excludes tax
             </div>
           </div>
           <div style={{ margin: "0rem 0rem 1rem 1rem"}}>
@@ -89,6 +90,7 @@ const DashboardPage = () => {
             />
           </div>
         </div>
+
         <div style={{ display: 'flex', gap: '2rem' }}>
           {/* 1. budget_summary */}
           <BudgetSummaryCard totalBudget={dashboardData.budget_summary.total_budget} totalExpenses={dashboardData.budget_summary.total_spent} />
@@ -99,6 +101,7 @@ const DashboardPage = () => {
             budget={dashboardData.budget_summary_prev_month.total_budget}
           />
         </div>
+        
         <div style={{ display: "flex", gap: '2rem' }}>
           {/* 3. category_spending */}
           <CategoryExpensePieChart
@@ -111,6 +114,12 @@ const DashboardPage = () => {
             colors={colorPalette} 
           />
         </div>
+
+        <div style={{ display: 'flex', gap: '2rem' }}>
+          <TopItemsList items={dashboardData.top_items} />
+          <TopMerchantsList merchants={dashboardData.top_merchants} />
+        </div>
+
         {/* 5. daily_spending,  */}
         <SpendingLineChart dailyData={dashboardData.daily_spending} monthlyData={dashboardData.monthly_spending} />
 
@@ -120,11 +129,6 @@ const DashboardPage = () => {
             data={dashboardData.category_expense_lines}
             categories={dashboardData.category_expense_categories}
           />
-        </div>
-
-        <div style={{ display: 'flex', gap: '2rem' }}>
-            <TopItemsList items={dashboardData.top_items} />
-            <TopMerchantsList merchants={dashboardData.top_merchants} />
         </div>
       </div>
     </AppLayout>
