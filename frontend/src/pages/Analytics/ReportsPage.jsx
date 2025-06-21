@@ -122,8 +122,12 @@ export default function ReportsPage() {
                             <span>Style: </span>
                             <FullColorSelect
                                 value={PROMPT_MODES.find((modeOption) => modeOption.id === mode)}
-                                onChange={(selected) => setMode(selected?.id || '')}
+                                onChange={(selected) => {
+                                    setMode(selected?.id );
+                                }}
                                 options={PROMPT_MODES}
+                                required={false}
+                                isInt={false}
                             />
                         </label>
                     </div>
