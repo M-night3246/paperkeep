@@ -14,9 +14,9 @@ export const useAuthFetch = () => {
     const csrfToken = getCsrfTokenFromCookie();
 
     const headers = {
-      ...options.headers,
       Authorization: `Bearer ${token}`,
       "X-CSRFToken": csrfToken,
+      ...options.headers,
     };
 
     const response = await fetch(url, {
