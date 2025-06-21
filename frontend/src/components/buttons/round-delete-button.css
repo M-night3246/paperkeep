@@ -10,11 +10,24 @@
   justify-content: center;
 }
 
-.delete-button-round svg {
+.delete-button-rect {
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: var(--red);
+  padding: 0.4rem 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-button-round svg,
+.delete-button-rect svg {
   color: var(--white);
   padding-top: 2px;
 }
 
-.delete-button-round:hover {
+.delete-button-round:hover,
+.delete-button-rect:hover {
   filter: brightness(0.8);
 }
