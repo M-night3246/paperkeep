@@ -7,7 +7,6 @@ import LargeButton from "../../components/buttons/LargeButton";
 import RoundDeleteButton from "../../components/buttons/RoundDeleteButton";
 import LoadingOverlay from "../../components/layout/LoadingOverlay";
 import OptionModal from "../../components/popups/OptionModal";
-import { FaTimes } from 'react-icons/fa';
 import { useNavigate } from "react-router";
 
 export default function UploadFinancialDocument() {
@@ -163,18 +162,19 @@ export default function UploadFinancialDocument() {
           <div className="upload-preview">
             <strong>Selected Files:</strong>
             {selectedFiles.length === 1 && selectedFiles[0].type.startsWith("image/") ? (
-              <div className="upload-preview-container">
-                <img
-                  src={URL.createObjectURL(selectedFiles[0])}
-                  alt="Preview"
-                  className="upload-preview-image"
-                />
-                <RoundDeleteButton
-                  onClick={() => handleRemoveFile(0)}
-                  size={18}
-                  className="delete-button-round"
-                />
-              </div>
+              <>
+                <div>{selectedFiles[0].name}</div>
+                <div className="upload-preview-container">
+                  <img
+                    src={URL.createObjectURL(selectedFiles[0])}
+                    alt="Preview"
+                    className="upload-preview-image" />
+                  <RoundDeleteButton
+                    onClick={() => handleRemoveFile(0)}
+                    size={18}
+                    className="delete-button-round" />
+                </div>
+              </>
             ) : (
               selectedFiles.map((file, i) => (
                 <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
