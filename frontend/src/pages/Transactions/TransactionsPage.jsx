@@ -365,7 +365,7 @@ export default function TransactionsPage() {
                   <td className="text-center">RM{parseFloat(item.price).toFixed(2)}</td>
                   <td>{item.business_name}</td>
                   <td>{item.category}</td>
-                  <td>{new Date(item.transaction_datetime).toLocaleString('en-GB', { timeZone: 'UTC' })}</td>
+                  <td>{new Date(item.transaction_datetime).toLocaleString()}</td>
                 </tr>
               ))
             )
@@ -386,8 +386,8 @@ export default function TransactionsPage() {
                   </td>
                   <td>{transaction.business_name}</td>
                   <td className="text-center">RM{transaction.total_amount.toFixed(2)}</td>
-                  <td>{new Date(transaction.transaction_datetime).toLocaleString('en-GB', { timeZone: 'UTC' })}</td>
-                  <td>{new Date(transaction.upload_datetime).toLocaleString('en-GB', { timeZone: 'UTC' })}</td>
+                  <td>{new Date(transaction.transaction_datetime).toLocaleString()}</td>
+                  <td>{new Date(transaction.upload_datetime).toLocaleString()}</td>
                   {showCategoryTotals && (
                     <td className="categories-cell">
                       {transaction.category_totals ? (
