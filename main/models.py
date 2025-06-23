@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Sum
+from django.utils.timezone import now
 
 class FinancialDocument(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -19,8 +20,9 @@ class FinancialDocument(models.Model):
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     tax = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    upload_datetime = models.DateTimeField(auto_now_add=True)
-    note = models.TextField(blank=True, default="")      
+    upload_datetime = models.DateTimeField(default=now)
+    note = models.TextField(blank=True, default="")    
+      
     def __str__(self):
         return f"{self.__class__.__name__} from {self.business_name} on {self.transaction_datetime}"
     
