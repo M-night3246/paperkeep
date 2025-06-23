@@ -1,22 +1,18 @@
 import React, { useEffect, useState } from "react";
 import AppLayout from '../../components/layout/AppLayout';
-import MonthlySpendingChart from "../../components/charts/MonthlySpendingChart";
-import CategorySpendingChart from "../../components/charts/CategorySpendingChart";
-import TopMerchantsChart from "../../components/charts/TopMerchantsChart";
-import TopItemsChart from "../../components/charts/TopItemsChart";
-import DailySpendingChart from "../../components/charts/DailySpendingChart";
 import { useAuthFetch } from "../../hooks/authFetch";
 import LoadingOverlay from "../../components/layout/LoadingOverlay";
+import MonthPicker from "../../components/datePicker/MonthPicker";
+
+// import CategoryExpenseBar from "../../components/charts/CategoryExpenseBar";
 import BudgetSummaryCard from "../../components/cards/BudgetSummaryCard";
 import BudgetProgressDonut from "../../components/cards/BudgetProgressDonut";
-import CategoryExpenseBar from "../../components/charts/CategoryExpenseBar";
-import BudgetExpenseCard from "../../components/cards/BudgetExpenseCard";
 import CategoryExpensePieChart from "../../components/cards/CategoryExpensePieChart";
-import CategoryExpenseLineChart from "../../components/cards/CategoryExpenseLineChart";
-import SpendingLineChart from "../../components/cards/SpendingLineChart";
+import BudgetExpenseCard from "../../components/cards/BudgetExpenseCard";
 import TopItemsList from "../../components/cards/TopItemsList";
 import TopMerchantsList from "../../components/cards/TopMerchantsList";
-import MonthPicker from "../../components/datePicker/MonthPicker";
+import SpendingLineChart from "../../components/cards/SpendingLineChart";
+import CategoryExpenseLineChart from "../../components/cards/CategoryExpenseLineChart";
 
 const DashboardPage = () => {
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
@@ -75,12 +71,11 @@ const DashboardPage = () => {
     <AppLayout>
 
       <div style={{ maxWidth: "100%" }}>
-        
         <div style={{ display: "flex", width: "100%", alignItems: "end", justifyContent: "space-between" }}>
           <div>
             <h1>Spending Dashboard</h1>
             <div style={{ padding: "0rem 0.5rem 0rem 0.5rem", textAlign: "justify", marginBottom: "1.5rem"}}>
-              *Amounts recorded in the dashboard excludes tax
+              Disclaimer: All figures exclude tax, except for Top Merchants and Spending Over Time, which use total amounts (including tax where applicable)
             </div>
           </div>
           <div style={{ margin: "0rem 0rem 1rem 1rem"}}>
