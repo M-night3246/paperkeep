@@ -7,6 +7,7 @@ import {
   Legend
 } from 'chart.js';
 import './budget-progress-donut.css';
+import { formatCurrency } from '../../services/formatting';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -43,7 +44,7 @@ export default function BudgetProgressDonut({ label, spent = 0, budget = 1 }) {
         <Doughnut data={data} options={options} />
         <div className="donut-center">
           <div className="donut-percent">{percentage.toFixed(1)}%</div>
-          <div className="donut-sub">of RM {budget.toLocaleString()}<br />spent</div>
+          <div className="donut-sub">of RM {formatCurrency(budget, false)}<br />spent</div>
         </div>
       </div>
     </div>

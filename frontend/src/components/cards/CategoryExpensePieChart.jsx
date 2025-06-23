@@ -8,6 +8,7 @@ import {
 import { Pie } from 'react-chartjs-2';
 import './category-expense-pie-chart.css';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import { formatCurrency } from '../../services/formatting';
 
 ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels);
 
@@ -53,7 +54,7 @@ export default function CategoryExpensePieChart({ data, colors }) {
                     label: function (context) {
                         const amount = context.raw;
                         const percentage = total ? ((amount / total) * 100).toFixed(1) : 0;
-                        return `${context.label}: RM ${amount.toLocaleString()} (${percentage}%)`;
+                        return `${context.label}: ${formatCurrency(amount)} (${percentage}%)`;
                     },
                 },
             },
@@ -65,7 +66,7 @@ export default function CategoryExpensePieChart({ data, colors }) {
                     weight: 'bold',
                     family: 'Poppins, sans-serif',
                 },
-                formatter: (value) => `RM ${value.toLocaleString()}`,
+                formatter: (value) => `${formatCurrency(value)}`,
                 // filter: function (context) {
                 //     const data = context.chart.data.datasets[0].data;
                 //     console.log(data);

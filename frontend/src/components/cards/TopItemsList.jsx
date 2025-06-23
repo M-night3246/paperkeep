@@ -1,5 +1,6 @@
 import React from 'react';
 import './top-items-list.css';
+import { formatCurrency } from '../../services/formatting';
 
 export default function TopItemsList({ items = [], title = "Top Items" }) {
   return (
@@ -12,7 +13,7 @@ export default function TopItemsList({ items = [], title = "Top Items" }) {
             <div className="item-name">{item.item}</div>
             <div style={{ width: "30%", display: "flex", justifyContent: "flex-end"}}>
                 <div className="item-times">x{item.times_bought}</div>
-                <div className="item-amount">RM {item.total_spent.toLocaleString()}</div>
+                <div className="item-amount">{formatCurrency(item.total_spent)}</div>
             </div>
           </li>
         ))}

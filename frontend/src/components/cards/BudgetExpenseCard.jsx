@@ -1,5 +1,6 @@
 import React from 'react';
 import './budget-expense-card.css';
+import { formatCurrency } from '../../services/formatting';
 
 export default function BudgetExpenseCard({ data = [], colors }) {
     return (
@@ -10,6 +11,7 @@ export default function BudgetExpenseCard({ data = [], colors }) {
                 const color = colors[index % colors.length];
                 const percentage = item.budget ? (item.spent / item.budget) * 100 : 0;
                 const formattedPercent = Math.min(percentage, 100).toFixed(0);
+
                 return (
                     <div key={item.name} className="budget-row">
                         <div className="progress-bar-wrapper">
@@ -23,7 +25,7 @@ export default function BudgetExpenseCard({ data = [], colors }) {
                         </div>
                         <div className="bar-details">
                             <span className="bar-label">
-                                RM {item.spent.toLocaleString()} / RM {item.budget.toLocaleString()}
+                                {formatCurrency(item.spent)} / {formatCurrency(item.budget)}
                             </span>
                             <span className="percent-text">{formattedPercent}% spent</span>
                         </div>

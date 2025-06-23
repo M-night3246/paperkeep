@@ -11,6 +11,7 @@ import {
 import { Line } from 'react-chartjs-2';
 import './spending-line-chart.css';
 import FullColorSelect from '../dropdowns/FullColorSelect';
+import { formatCurrency } from '../../services/formatting';
 
 ChartJS.register(LineElement, PointElement, CategoryScale, LinearScale, Tooltip, Legend);
 
@@ -50,7 +51,7 @@ export default function SpendingLineChart({ dailyData = [], monthlyData = [] }) 
       legend: { display: false },
       tooltip: {
         callbacks: {
-          label: ctx => `RM ${ctx.parsed.y.toLocaleString()}`,
+          label: ctx => `${formatCurrency(ctx.parsed.y)}`,
         },
       },
       datalabels: {
@@ -94,6 +95,7 @@ export default function SpendingLineChart({ dailyData = [], monthlyData = [] }) 
         },
         beginAtZero: true,
         ticks: {
+          callback: (value) => `RM ${value}`,
           font: {
             family: 'Poppins', size: 12
           },
