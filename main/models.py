@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models import Sum
 from django.utils.timezone import now
+from django.db.models import Q
 
 class FinancialDocument(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -57,7 +57,11 @@ class UserSpendingCategory(models.Model):
     is_main = models.BooleanField(default=False)
     
     class Meta:
-        unique_together = ('user', 'system_category', 'is_main')
+        models.UniqueConstraint(
+            fields=['user', 'system_category'],
+            condition=Q(is_main=True),
+            name='unique_main_per_syscat_per_user'
+        )
     
 class Budget(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
