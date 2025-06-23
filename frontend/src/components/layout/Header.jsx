@@ -27,7 +27,7 @@ const Header = ({ onToggleSidebar, isSidebarOpen, dark, setDark }) => {
   };
 
   return (
-    <header className={isSidebarOpen ? "header-fixed" : "header"}>
+    <header className="header">
       <button className="header-menu-button" onClick={onToggleSidebar}>
           {isSidebarOpen ? <FiX size={24}/> : <FiMenu size={24}/>}
       </button>

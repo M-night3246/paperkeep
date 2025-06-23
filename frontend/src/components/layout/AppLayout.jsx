@@ -11,9 +11,7 @@ const Layout = ({ children }) => {
     <>
       <Header onToggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
       <Sidebar isOpen={isSidebarOpen} onClose={toggleSidebar} />
-      <div style={isSidebarOpen ? { paddingTop: "60px" } : {}}>
-        <main className="layout-content">{children}</main>
-      </div>
+      <main className="layout-content">{children}</main>
       {isSidebarOpen && (
         <div className="backdrop" onClick={toggleSidebar}></div>
       )}
