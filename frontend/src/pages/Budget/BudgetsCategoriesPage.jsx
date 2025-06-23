@@ -19,6 +19,10 @@ export default function BudgetsCategoriesPage() {
 
   const [editableCategories, setEditableCategories] = useState([]);
 
+  const MAX_CUSTOM_CATEGORIES = 6;
+  const customCategoryCount = categories.filter(cat => !cat.is_main).length;
+  const reachedLimit = customCategoryCount >= MAX_CUSTOM_CATEGORIES;
+
   const fetchData = async () => {
     const catData = await authFetch(`${API_BASE_URL}/api/main/user-categories/`);
     const sysCatData = await authFetch(`${API_BASE_URL}/api/main/system-categories/`);
@@ -72,7 +76,8 @@ export default function BudgetsCategoriesPage() {
   };
 
   const handleAddCategory = async () => {
-    if (!newCategoryName.trim() || !newCategoryParent) return;
+    if (!newCategoryName.trim() || !newCategoryParent || reachedLimit) return;
+
     await authFetch(`${API_BASE_URL}/api/main/user-categories/`, {
       method: 'POST',
       headers: { "Content-Type": "application/json" },
@@ -223,7 +228,20 @@ export default function BudgetsCategoriesPage() {
             options={systemCategories.map(s => ({ ...s, name: s.default_name }))}
             required
           />
-          <button onClick={handleAddCategory}>Add Category</button>
+          <button
+            onClick={handleAddCategory}
+            disabled={reachedLimit}
+            title={reachedLimit ? "Maximum of 12 custom categories reached." : ""}
+            style={{
+              cursor: reachedLimit ? "not-allowed" : "pointer",
+              opacity: reachedLimit ? 0.8 : 1,
+            }}
+          >
+            Add Category
+          </button>
+        </div>
+        <div style={{ fontSize: "0.8rem", color: "var(--grey)" }}>
+          * Maximum of 12 categories
         </div>
       </div>
       </div>
