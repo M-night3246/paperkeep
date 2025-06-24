@@ -1,19 +1,20 @@
-from django.shortcuts import render, redirect
 from main.models import FinancialDocument, LineItem, Budget
-from .utils import update_heatmap_with_new_address
 from .prompts import generate_spending_summary
 from .models import VisitedPlace
-from .serializers import VisitedPlaceSerializer, VisitedPlaceWithTotalSerializer
+from .serializers import VisitedPlaceWithTotalSerializer
 from rest_framework import permissions, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from django.db.models import Sum, Count, Max
+from django.db.models import Sum, Count
 from django.db.models.functions import TruncDate, TruncMonth, ExtractDay, ExtractMonth
-from collections import defaultdict
+from django.shortcuts import render, redirect
 from django.utils.timezone import now
 from datetime import date
 import calendar
+from collections import defaultdict
+
+# from .utils import update_heatmap_with_new_address
 
 class VisitedPlaceListAPIView(generics.ListAPIView):
     serializer_class = VisitedPlaceWithTotalSerializer
@@ -266,24 +267,6 @@ class DashboardDataAPIView(APIView):
             
         })
 
-class VisitedPlacesAPIView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        visited_places = (
-            FinancialDocument.objects
-            .filter(user=request.user)  # If you associate documents to users
-            .values('business_name')
-            .annotate(
-                total_spent=Sum('line_items__price'),
-                last_visited=Max('transaction_datetime'),
-                lat=Max('business_lat'),
-                lng=Max('business_lng')
-            )
-            .order_by('-last_visited')
-        )
-        return Response(visited_places)
-
 class FinancialDocumentSummaryAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -304,14 +287,31 @@ class FinancialDocumentSummaryAPIView(APIView):
         summary_text = generate_spending_summary(docs, mode=mode, date_range_label=f"{date_from} to {date_to}")
         return Response({"summary": summary_text})
 
+# class VisitedPlacesAPIView(APIView):
+#     permission_classes = [IsAuthenticated]
 
-def update_heatmap(request):
-    # Update heatmap with the address
-    address = request.session.get('business_address')
-    update_heatmap_with_new_address(address)
+#     def get(self, request):
+#         visited_places = (
+#             FinancialDocument.objects
+#             .filter(user=request.user)
+#             .values('business_name')
+#             .annotate(
+#                 total_spent=Sum('line_items__price'),
+#                 last_visited=Max('transaction_datetime'),
+#                 lat=Max('business_lat'),
+#                 lng=Max('business_lng')
+#             )
+#             .order_by('-last_visited')
+#         )
+#         return Response(visited_places)
 
-    # Return the heatmap file to the user
-    return redirect("view_heatmap")
+# def update_heatmap(request):
+#     # Update heatmap with the address
+#     address = request.session.get('business_address')
+#     update_heatmap_with_new_address(address)
 
-def view_heatmap(request):
-    return render(request, 'heatmap.html')
+#     # Return the heatmap file to the user
+#     return redirect("view_heatmap")
+
+# def view_heatmap(request):
+#     return render(request, 'heatmap.html')

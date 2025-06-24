@@ -1,7 +1,6 @@
 from django.db import models
 from rest_framework import serializers
 from .models import VisitedPlace
-from main.models import FinancialDocument
 
 class VisitedPlaceSerializer(serializers.ModelSerializer):
     class Meta:

@@ -1,7 +1,5 @@
 import google.generativeai as genai
-from django.conf import settings
 from decimal import Decimal
-from datetime import datetime
 from collections import defaultdict
 from dotenv import load_dotenv
 import os

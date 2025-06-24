@@ -3,9 +3,9 @@ from django.dispatch import receiver
 from main.models import FinancialDocument 
 from analytics.models import VisitedPlace
 
+# Ensure old visited places are cleared if they are no longer referenced
 @receiver(post_save, sender=FinancialDocument)
 def cleanup_orphaned_place_on_update(sender, instance, **kwargs):
-    # Ensure old visited places are cleaned if they are no longer referenced
     for place in VisitedPlace.objects.filter(user=instance.user):
         if not place.documents.exists():
             place.delete()
