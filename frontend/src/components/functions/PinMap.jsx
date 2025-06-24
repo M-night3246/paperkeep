@@ -2,11 +2,11 @@ import React, { useEffect, useRef } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 
-const defaultIcon = L.icon({
-  iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-});
+// const defaultIcon = L.icon({
+//   iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
+//   iconSize: [25, 41],
+//   iconAnchor: [12, 41],
+// });
 
 const customIcon = L.divIcon({
   className: 'custom-marker',

@@ -18,10 +18,7 @@ const DashboardPage = () => {
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
   const authFetch = useAuthFetch()
   const [dashboardData, setDashboardData] = useState(null);
-
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [year, setYear] = useState();
-  const [month, setMonth] = useState();
 
   const colorPalette = [
     '#e6a1a6',

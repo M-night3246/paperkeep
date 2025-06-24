@@ -26,12 +26,5 @@ const Sidebar = ({ isOpen }) => {
   );
 };
 
-const SidebarItem = ({ icon, label, active, to }) => (
-  <Link className={`nav-item ${active ? 'active' : ''}`} to={to}>
-    <div className="nav-icon">{icon}</div>
-    <div className="nav-label">{label}</div>
-  </Link>
-);
-
 export default Sidebar;
 

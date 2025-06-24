@@ -25,8 +25,4 @@ urlpatterns = [
     path("api/main/", include("main.urls")),
     path("api/receipts/", include("receipts.urls")),
     path("admin/", admin.site.urls),
-    
-    # path("", include("main.urls")),
-    # path("receipts/", include("receipts.urls")),
-    # path("analytics/", include("analytics.urls")),
 ]
