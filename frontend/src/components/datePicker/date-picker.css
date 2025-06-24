@@ -1,0 +1,36 @@
+.month-picker-input {
+    width: 200px;
+}
+
+.year-picker-input {
+    width: 200px;
+}
+
+.react-datepicker {
+    font-family: Poppins, sans-serif;
+}
+
+.react-datepicker__header {
+    background-color: var(--accent-color);
+    color: white;
+}
+.react-datepicker__close-icon::after {
+    background-color: var(--accent-color);
+}
+
+.react-datepicker__navigation-icon::before {
+    border-color: var(--white);
+}
+
+.react-datepicker__month-text--selected,
+.react-datepicker__month-text--keyboard-selected {
+    background-color: var(--accent-color);
+    color: var(--white);
+}
+
+.react-datepicker__month-text--keyboard-selected:not([aria-disabled="true"]):hover, 
+.react-datepicker__month-text--selected:not([aria-disabled="true"]):hover{
+    filter: brightness(0.8);
+    color: black;
+    background-color: var(--accent-color);
+}

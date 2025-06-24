@@ -4,7 +4,6 @@ import './reports-page.css';
 import { useAuthFetch } from '../../hooks/authFetch';
 import { FaPrint, FaFileAlt } from 'react-icons/fa';
 import MonthPicker from '../../components/datePicker/MonthPicker';
-import YearPicker from '../../components/datePicker/YearPicker';
 import { marked } from 'marked';
 import LargeButton from '../../components/buttons/LargeButton';
 import FullColorSelect from '../../components/dropdowns/FullColorSelect';
@@ -111,6 +110,7 @@ export default function ReportsPage() {
                             <MonthPicker
                                 value={selectedDate}
                                 onChange={setSelectedDate}
+                                isClearable={false}
                             />
                         </label>
                         <LargeButton onClick={fetchSummary} className="generate-button">
