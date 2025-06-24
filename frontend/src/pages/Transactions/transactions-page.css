@@ -59,6 +59,14 @@
   gap: 1rem;
 }
 
+.bottom-left-align {
+  display: flex;
+  flex-direction: row;
+  align-self: flex-start;
+  height: 100%;
+  gap: 1rem;
+}
+
 .add-button:hover {
   filter: brightness(0.8);
 }

@@ -12,6 +12,7 @@ import ToggleSwitch from "../../components/buttons/ToggleSwitch";
 import LoadingOverlay from "../../components/layout/LoadingOverlay";
 import LargeButton from "../../components/buttons/LargeButton";
 import OptionModal from "../../components/popups/OptionModal";
+import MonthPicker from "../../components/datePicker/MonthPicker";
 
 export default function TransactionsPage() {
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
@@ -28,6 +29,8 @@ export default function TransactionsPage() {
   const [sortConfig, setSortConfig] = useState({ key: 'transaction_datetime', direction: 'desc' });
   const [showLineItemsView, setShowLineItemsView] = useState(false);
   const [showCategoryTotals, setShowCategoryTotals] = useState(false);
+  const [selectedDate, setSelectedDate] = useState();
+  const [allTransactions, setAllTransactions] = useState([]);
 
   useEffect(() => {
     async function fetchTransactions() {
@@ -35,15 +38,38 @@ export default function TransactionsPage() {
         const data = await authFetch(`${API_BASE_URL}/api/receipts/documents/`, {
           method: "GET",
         });
-        setTransactions(data);
+        setAllTransactions(data);
       } catch (err) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
     }
+
     fetchTransactions();
   }, []);
+
+useEffect(() => {
+  if (!selectedDate) {
+    setTransactions(allTransactions);
+    return;
+  }
+
+  const month = selectedDate.getMonth() + 1;
+  const year = selectedDate.getFullYear();
+
+  const filtered = allTransactions.filter((t) => {
+    const date = new Date(t.transaction_datetime);
+    return (
+      date.getFullYear() === year &&
+      date.getMonth() + 1 === month
+    );
+  });
+
+  setTransactions(filtered);
+}, [selectedDate, allTransactions]);
+
+
 
   const sortedTransactions = [...transactions].sort((a, b) => {
     const aVal = a[sortConfig.key];
@@ -258,17 +284,19 @@ export default function TransactionsPage() {
           }
         ]}
       />
+      <h1 style={{ maxWidth: "fit-content" }}>All Transactions</h1>
       <div style={{ display: "flex", height: "100%" }}>
-        <h1 style={{ maxWidth: "fit-content" }}>All Transactions</h1>
+        <div className={"bottom-left-align"} style={{ marginBottom: "1rem" }}>
+        <IconSelect
+          options={bulkActionOptions}
+          onChange={handleBulkAction}
+          disabled={selectedIds.length < 1}
+        />
+        <LargeButton className="add-button" onClick={() => navigate('/upload')}>
+          + Add
+        </LargeButton>
+        </div>
         <div className={"bottom-right-align"} style={{ marginBottom: "1rem" }}>
-          <IconSelect
-            options={bulkActionOptions}
-            onChange={handleBulkAction}
-            disabled={selectedIds.length < 1}
-          />
-          <LargeButton className="add-button" onClick={() => navigate('/upload')}>
-            + Add
-          </LargeButton>
           <div style={{ width: "50%", gap: "0.5rem" }}>
             <ToggleSwitch
               value={showCategoryTotals}
@@ -290,6 +318,7 @@ export default function TransactionsPage() {
               textSize="0.75rem"
             />
           </div>
+          <MonthPicker value={selectedDate} onChange={setSelectedDate} isClearable />
         </div>
       </div>
       <table className="transaction-table">
