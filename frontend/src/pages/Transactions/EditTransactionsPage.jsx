@@ -47,11 +47,22 @@ export default function EditTransactionsPage() {
     fetchDocumentAndCategories();
   }, [id]);
 
+  function formatToLocalDatetime(datetimeString) {
+    const date = new Date(datetimeString);
+    const year = date.getFullYear();
+    const month = `${date.getMonth() + 1}`.padStart(2, "0");
+    const day = `${date.getDate()}`.padStart(2, "0");
+    const hours = `${date.getHours()}`.padStart(2, "0");
+    const minutes = `${date.getMinutes()}`.padStart(2, "0");
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  }
+
   const handleDocumentFieldChange = (field, value) => {
     setDocumentData(prev => ({
       ...prev,
       [field]: value
     }));
+    console.log("field: ", field, "  value: ", value);
   };
 
   const handleLineItemChange = (index, field, value) => {
@@ -139,10 +150,15 @@ export default function EditTransactionsPage() {
                 type="datetime-local"
                 value={
                   documentData?.transaction_datetime
-                    ? new Date(documentData.transaction_datetime).toISOString().slice(0, 16)
+                    ? formatToLocalDatetime(documentData.transaction_datetime)
                     : ""
                 }
-                onChange={(e) => handleDocumentFieldChange("transaction_datetime", e.target.value)}
+                onChange={(e) => {
+                    const localValue = e.target.value;
+                    const localDate = new Date(localValue);
+                    const utcISOString = localDate.toISOString();
+                    handleDocumentFieldChange("transaction_datetime", utcISOString);
+                }}
               />
             </div>
             <div className="form-field-row">
