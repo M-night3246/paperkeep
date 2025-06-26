@@ -102,6 +102,7 @@ class UploadFinancialDocumentAPIView(APIView):
                 continue
             
             transaction_datetime = extracted_data.get('transaction_datetime', '')
+            utc_dt = None
             
             if (transaction_datetime):
                 naive_dt = datetime.strptime(transaction_datetime, '%Y-%m-%d %H:%M:%S')
