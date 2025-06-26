@@ -83,24 +83,28 @@ export default function UploadFinancialDocument() {
     let message = "";
 
     if (succeeded.length > 0) {
-      message += `✅ ${succeeded.length} file(s) uploaded successfully:\n`;
-      message += succeeded.map((s) => `• ${s.filename}`).join("\n") + "\n\n";
+      const uniqueSuccessFiles = Array.from(
+        new Map(succeeded.map(file => [file.filename, file])).values()
+      );
+      message += `✅ ${uniqueSuccessFiles.length} file(s) uploaded successfully:\n`;
+      message += uniqueSuccessFiles.map(name => `• ${name.filename}`).join("\n") + "\n\n";
+      setMessage(message);
+
+      // Prompt to open successful docs
+      if (uniqueSuccessFiles.length > 0) {
+        setSucceededUploads(uniqueSuccessFiles);
+        setShowModal(true);
+      }
     }
 
     if (failed.length > 0) {
       message += `❌ ${failed.length} file(s) failed:\n`;
       message += failed.map((f) => `• ${f.filename}: ${JSON.stringify(f.error)}`).join("\n");
+      setMessage(message);
     }
 
-    setMessage(message);
     setIsUploading(false);
     setSelectedFiles([]);
-
-    // Prompt to open successful docs
-    if (succeeded.length > 0) {
-      setSucceededUploads(succeeded);
-      setShowModal(true);
-    }
   };
 
   return (
@@ -114,8 +118,8 @@ export default function UploadFinancialDocument() {
           {
             label: "Open Now",
             onClick: () => {
-              succeededUploads.forEach(({ docId }) => {
-                if (docId) window.open(`/edit/${docId}`, "_blank");
+              succeededUploads.forEach(({docId}) => {
+                window.open(`/edit/${docId}`, "_blank");
               });
               setShowModal(false);
             },
