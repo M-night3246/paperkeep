@@ -13,11 +13,11 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 router = DefaultRouter()
-router.register(r'financial-documents', FinancialDocumentViewSet)
-router.register(r'line-items', LineItemViewSet)
-router.register(r'system-categories', SystemSpendingCategoryViewSet, basename='system-category')
+router.register(r'financial-documents', FinancialDocumentViewSet, basename='financial-document')
+router.register(r'line-items', LineItemViewSet, basename='line-item')
+router.register(r'system-categories', SystemSpendingCategoryViewSet)
 router.register(r'user-categories', UserSpendingCategoryViewSet, basename='user-category')
-router.register(r'budgets', BudgetViewSet)
+router.register(r'budgets', BudgetViewSet, basename='budget')
 
 urlpatterns = [
     path("", include(router.urls)),

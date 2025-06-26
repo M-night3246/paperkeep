@@ -17,13 +17,19 @@ def init_csrf_view(request):
 
 class FinancialDocumentViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
-    queryset = FinancialDocument.objects.all()
+    # queryset = FinancialDocument.objects.all()
     serializer_class = FinancialDocumentSerializer
+    
+    def get_queryset(self):
+        return FinancialDocument.objects.filter(user=self.request.user)
 
 class LineItemViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
-    queryset = LineItem.objects.all()
+    # queryset = LineItem.objects.all()
     serializer_class = LineItemSerializer
+    
+    def get_queryset(self):
+        return LineItem.objects.filter(user=self.request.user)
 
 class SystemSpendingCategoryViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = SystemSpendingCategory.objects.all().order_by('key')
@@ -55,7 +61,7 @@ class UserSpendingCategoryViewSet(viewsets.ModelViewSet):
         return super().destroy(request, *args, **kwargs)
 
 class BudgetViewSet(viewsets.ModelViewSet):
-    queryset = Budget.objects.all()
+    # queryset = Budget.objects.all()
     serializer_class = BudgetSerializer
     permission_classes = [permissions.IsAuthenticated]
 
