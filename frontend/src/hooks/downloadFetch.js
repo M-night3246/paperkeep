@@ -5,7 +5,7 @@ export const downloadFetch = async (url) => {
   const user = auth.currentUser;
   if (!user) throw new Error("Not authenticated");
 
-  const token = await user.getIdToken();
+  const token = await user.getIdToken(true);
   const csrfToken = document.cookie.match(/csrftoken=([^;]+)/)?.[1];
 
   const response = await fetch(url, {

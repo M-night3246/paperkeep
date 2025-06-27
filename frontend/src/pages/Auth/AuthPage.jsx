@@ -28,7 +28,6 @@ export default function AuthPage() {
       } else {
         await login(email, password);
       }
-      navigate("/");
     } catch (err) {
       setError(err.message);
     }
