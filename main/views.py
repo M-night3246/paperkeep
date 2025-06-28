@@ -1,15 +1,11 @@
-from django.shortcuts import render, redirect, get_object_or_404
 from .models import *
+from rest_framework import viewsets, status
 from django.conf import settings
-from rest_framework import viewsets
-from .serializers import FinancialDocumentSerializer, LineItemSerializer, UserSpendingCategorySerializer, SystemSpendingCategorySerializer, BudgetSerializer
-from rest_framework import permissions
-
-import json
-from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
+from .serializers import FinancialDocumentSerializer, LineItemSerializer, UserSpendingCategorySerializer, SystemSpendingCategorySerializer, BudgetSerializer
+from rest_framework import permissions
+from rest_framework.response import Response
 
 @ensure_csrf_cookie
 def init_csrf_view(request):
