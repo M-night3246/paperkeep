@@ -53,8 +53,21 @@ export default function BudgetsCategoriesPage() {
       }),
     });
 
+    const existingBudget = budgets.find(b => b.category.id === cat.id);
+
     // If there's a valid budget amount, save or update it
     if (cat.editedBudget !== undefined && cat.editedBudget !== "") {
+    if (existingBudget) {
+      // Update existing budget
+      await authFetch(`${API_BASE_URL}/api/main/budgets/${existingBudget.id}/`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: cat.editedBudget,
+        }),
+      });
+    } else {
+      // Create new budget
       await authFetch(`${API_BASE_URL}/api/main/budgets/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -64,6 +77,7 @@ export default function BudgetsCategoriesPage() {
         }),
       });
     }
+  }
 
     fetchData();
   };
