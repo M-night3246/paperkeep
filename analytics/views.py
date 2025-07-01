@@ -1,4 +1,4 @@
-from main.models import FinancialDocument, LineItem, Budget
+from main.models import FinancialDocument, LineItem, Budget, UserSpendingCategory
 from .prompts import generate_spending_summary
 from .models import VisitedPlace
 from .serializers import VisitedPlaceWithTotalSerializer
@@ -213,12 +213,12 @@ class DashboardDataAPIView(APIView):
             if 1 <= month_temp <= 12:
                 category_expense_lines[cat_id]['monthly'][month_temp - 1] = float(entry['total'])
 
-        user_categories_qs = Budget.objects.select_related('category').filter(user=user).values('category__id', 'category__name')
+        user_categories_qs = UserSpendingCategory.objects.filter(user=user).values('id', 'name')
 
         categories = [
             {
-                'id': str(entry['category__id']),
-                'name': entry['category__name']
+                'id': str(entry['id']),
+                'name': entry['name']
             }
             for entry in user_categories_qs
         ]
@@ -263,8 +263,6 @@ class DashboardDataAPIView(APIView):
             'monthly_spending': month_spending,
             'top_items': list(top_items),
             'top_merchants': list(top_merchants),
-            
-            
         })
 
 class FinancialDocumentSummaryAPIView(APIView):
