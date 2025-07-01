@@ -72,7 +72,7 @@ const DashboardPage = () => {
           <div>
             <h1>Spending Dashboard</h1>
             <div style={{ padding: "0rem 0.5rem 0rem 0.5rem", textAlign: "justify", marginBottom: "1.5rem"}}>
-              Disclaimer: All figures exclude tax, except for Top Merchants and Spending Over Time, which use total amounts (including tax where applicable)
+              Disclaimer: All figures are calculated with line item prices, except for Top Merchants and Spending Over Time, which use total amounts (including tax where applicable)
             </div>
           </div>
           <div style={{ margin: "0rem 0rem 1rem 1rem"}}>
